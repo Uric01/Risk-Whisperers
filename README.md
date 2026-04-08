@@ -18,6 +18,7 @@ The system is fully designed with **Bootstrap 5**, leveraging custom styling for
 
 ## How to Test the Role-Based Mapping
 A script (`auth.js`) automatically detects the role logged-in with to replicate a Role-Based Access Control (RBAC) system. The system natively supports **Admin** and **Read-Only** users.
+Additional mapping needs to be made for this in HTML files to reference this, the js file is just for testing
 
 1.  Open `login.html` in your web browser.
 2.  **To test Admin access:** Enter `admin` as the username. This will give you full access to create assets, risks, and mitigations.
