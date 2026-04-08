@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Mitigation - Risk Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="dashboard.html">
+                <i class="bi bi-shield-check me-2 text-info"></i>RiskSys
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="assets.html">Assets</a></li>
+                    <li class="nav-item"><a class="nav-link" href="risks.html">Risks</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="add_mitigation.html">Mitigations</a></li>
+                    <li class="nav-item"><a class="nav-link" href="reports.html">Reports</a></li>
+                    <li class="nav-item"><a class="nav-link" href="audit_logs.html">Audit Logs</a></li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <span class="text-light me-3"><i class="bi bi-person-circle me-1"></i> Admin User</span>
+                    <a href="login.html" class="btn btn-outline-light btn-sm">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-sm border-success border-top border-4">
+                    <div class="card-header bg-white py-3">
+                        <h4 class="mb-0 text-success"><i class="bi bi-shield-plus me-2"></i>Add Mitigation Action</h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <form id="mitigationForm">
+                            <div class="mb-4">
+                                <!-- this should be dynamic from the db-->
+                                <label class="form-label fw-bold">Selected Risk</label>
+                                <div class="p-3 bg-light border rounded">
+                                    <strong>RSK-101:</strong> Potential overheating due to lack of ventilation (Asset:
+                                    PLC Controller 01)
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="actionDesc" class="form-label fw-bold">Action Description <span
+                                        class="text-danger">*</span></label>
+                                <textarea class="form-control" id="actionDesc" rows="3"
+                                    placeholder="Describe the steps to mitigate this risk..."></textarea>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="assignedTo" class="form-label fw-bold">Assigned To <span
+                                            class="text-danger">*</span></label>
+                                    <select class="form-select" id="assignedTo">
+                                        <option value="">Select User...</option>
+                                        <option value="user1">John Doe (Engineering)</option>
+                                        <option value="user2">Jane Smith (IT Ops)</option>
+                                        <option value="user3">Mike Johnson (Facilities)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="targetDate" class="form-label fw-bold">Target Date</label>
+                                    <input type="date" class="form-control" id="targetDate">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="progressStatus" class="form-label fw-bold">Progress Status</label>
+                                <select class="form-select" id="progressStatus">
+                                    <option value="Not Started">Not Started</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Completed">Completed</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="comments" class="form-label fw-bold">Comments</label>
+                                <textarea class="form-control" id="comments" rows="2"
+                                    placeholder="Additional notes..."></textarea>
+                            </div>
+                            <!-- this is where we add the ISO27001 evaluation-->
+                            <hr class="my-4 text-muted">
+                            <h6 class="mb-3 text-secondary"><i class="bi bi-shield-lock me-2"></i>ISO 27001 Evaluation
+                            </h6>
+                            <div class="mb-4 bg-light rounded p-3 border">
+                                <label for="effectivenessReviewDate" class="form-label fw-bold"><i
+                                        class="bi bi-calendar-check text-success me-1"></i>Effectiveness Review
+                                    Date</label>
+                                <input type="date" class="form-control w-50" id="effectivenessReviewDate">
+                                <div class="form-text mt-1 text-muted">Schedule a date to evaluate if this mitigation
+                                    action successfully reduced the risk as intended.</div>
+                            </div>
+
+                            <div id="validationMessage" class="alert alert-danger d-none" role="alert">
+                                Please provide an Action Description and assign a user.
+                            </div>
+                            <div id="successMessage" class="alert alert-success d-none" role="alert">
+                                Mitigation action saved successfully! Redirecting...
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2 border-top pt-4">
+                                <button type="button" class="btn btn-light border"
+                                    onclick="window.location.href='risks.html'">Cancel</button>
+                                <button type="button" class="btn btn-success" onclick="handleSave(event)">
+                                    <i class="bi bi-save me-1"></i> Save Mitigation
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function handleSave(e) {
+            e.preventDefault();
+            const desc = document.getElementById('actionDesc').value;
+            const assigned = document.getElementById('assignedTo').value;
+
+            const err = document.getElementById('validationMessage');
+            const success = document.getElementById('successMessage');
+
+            if (!desc || !assigned) {
+                err.classList.remove('d-none');
+                success.classList.add('d-none');
+            } else {
+                err.classList.add('d-none');
+                success.classList.remove('d-none');
+                setTimeout(() => {
+                    window.location.href = 'risks.html';
+                }, 1500);
+            }
+        }
+    </script>
+</body>
+
+</html>

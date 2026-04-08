@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit Logs - Risk Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="dashboard.html">
+                <i class="bi bi-shield-check me-2 text-info"></i>RiskSys
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="assets.html">Assets</a></li>
+                    <li class="nav-item"><a class="nav-link" href="risks.html">Risks</a></li>
+                    <li class="nav-item"><a class="nav-link" href="add_mitigation.html">Mitigations</a></li>
+                    <li class="nav-item"><a class="nav-link" href="reports.html">Reports</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="audit_logs.html">Audit Logs</a></li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <span class="text-light me-3"><i class="bi bi-person-circle me-1"></i> Admin User</span>
+                    <a href="login.html" class="btn btn-outline-light btn-sm">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="page-header">
+            <h2>Audit Trail</h2>
+            <p class="text-muted mb-0">System-wide immutable log of user actions.</p>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Filter by User...">
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select">
+                            <option value="">All Action Types</option>
+                            <option value="CREATE">CREATE</option>
+                            <option value="UPDATE">UPDATE</option>
+                            <option value="DELETE">DELETE</option>
+                            <option value="LOGIN">LOGIN</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text">Date Range</span>
+                            <input type="date" class="form-control">
+                            <span class="input-group-text">to</span>
+                            <input type="date" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-secondary w-100"><i class="bi bi-search me-1"></i> Search</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 font-monospace small">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Log ID</th>
+                                <th>User</th>
+                                <th>Action Type</th>
+                                <th>Entity Name</th>
+                                <th>Entity ID</th>
+                                <th>Action Date (UTC)</th>
+                                <th>Action Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-muted">LOG-9942</td>
+                                <td>Admin User</td>
+                                <td><span class="badge bg-primary">CREATE</span></td>
+                                <td>Risk</td>
+                                <td>RSK-105</td>
+                                <td>2026-04-02 09:30:12</td>
+                                <td>Created new risk attached to Asset 210</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">LOG-9941</td>
+                                <td>Jane Smith</td>
+                                <td><span class="badge bg-info text-dark">UPDATE</span></td>
+                                <td>Mitigation</td>
+                                <td>MIT-401</td>
+                                <td>2026-04-02 09:15:05</td>
+                                <td>Status changed from 'Open' to 'In Progress'</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">LOG-9940</td>
+                                <td>System</td>
+                                <td><span class="badge bg-secondary">LOGIN</span></td>
+                                <td>User Session</td>
+                                <td>USR-Admin</td>
+                                <td>2026-04-02 09:00:00</td>
+                                <td>Successful login via Chrome (IP: 192.168.1.10)</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">LOG-9939</td>
+                                <td>John Doe</td>
+                                <td><span class="badge bg-primary">CREATE</span></td>
+                                <td>Asset</td>
+                                <td>301</td>
+                                <td>2026-04-01 16:45:22</td>
+                                <td>Created asset 'Core Switch 01'</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">LOG-9938</td>
+                                <td>Admin User</td>
+                                <td><span class="badge bg-danger">DELETE</span></td>
+                                <td>Risk</td>
+                                <td>RSK-099</td>
+                                <td>2026-04-01 14:20:10</td>
+                                <td>Deleted obsolete risk entry</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

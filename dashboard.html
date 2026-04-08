@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Asset Risk Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Nav bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="dashboard.html">
+                <i class="bi bi-shield-check me-2 text-info"></i>RiskSys
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link active" href="dashboard.html">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="assets.html">Assets</a></li>
+                    <li class="nav-item"><a class="nav-link" href="risks.html">Risks</a></li>
+                    <li class="nav-item"><a class="nav-link" href="add_mitigation.html">Mitigations</a></li>
+                    <li class="nav-item"><a class="nav-link" href="reports.html">Reports</a></li>
+                    <li class="nav-item"><a class="nav-link" href="audit_logs.html">Audit Logs</a></li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <span id="navUserDisplay" class="text-light me-3"><i class="bi bi-person-circle me-1"></i> Admin
+                        User</span>
+                    <a href="login.html" class="btn btn-outline-light btn-sm">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- main content  area-->
+    <div class="container mt-4">
+        <div class="page-header d-flex justify-content-between align-items-center">
+            <div>
+                <h2>Welcome</h2>
+                <p class="text-muted mb-0">Here's an overview of your asset risks today.</p>
+            </div>
+            <div>
+                <a href="add_asset.html" class="btn btn-primary me-2"><i class="bi bi-plus-circle me-1"></i>
+                    Add
+                    Asset</a>
+                <a href="add_risk.html" class="btn btn-danger me-2"><i
+                        class="bi bi-exclamation-triangle me-1"></i> Add
+                    Risk</a>
+                <a href="reports.html" class="btn btn-outline-secondary"><i
+                        class="bi bi-file-earmark-bar-graph me-1"></i> View Reports</a>
+            </div>
+        </div>
+
+        <!-- summary cards this data from db with calculation -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-3">
+                <div class="card summary-card bg-primary text-white h-100">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-1">Total Assets</h6>
+                            <h2 class="mb-0 fw-bold">1,245</h2>
+                        </div>
+                        <i class="bi bi-boxes card-icon"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card summary-card bg-danger text-white h-100">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-1">Total Risks</h6>
+                            <h2 class="mb-0 fw-bold">342</h2>
+                        </div>
+                        <i class="bi bi-exclamation-octagon card-icon"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card summary-card bg-warning text-dark h-100">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-1">Open Risks</h6>
+                            <h2 class="mb-0 fw-bold">89</h2>
+                        </div>
+                        <i class="bi bi-hourglass-split card-icon text-dark"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card summary-card bg-success text-white h-100">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-1">Completed Mitigations</h6>
+                            <h2 class="mb-0 fw-bold">156</h2>
+                        </div>
+                        <i class="bi bi-check-circle card-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- recent activity section  - we should pull data from db to fill this, maybe recent for the week-->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Recent Risks</h5>
+                        <a href="risks.html" class="btn btn-sm btn-outline-primary">View All</a>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Risk ID</th>
+                                    <th>Description</th>
+                                    <th>Rating</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>RSK-101</td>
+                                    <td>Server room AC failure potential</td>
+                                    <td><span class="badge bg-danger">High (20)</span></td>
+                                    <td><span class="badge rounded-pill bg-warning text-dark">Open</span></td>
+                                </tr>
+                                <tr>
+                                    <td>RSK-102</td>
+                                    <td>Database out of disk space</td>
+                                    <td><span class="badge bg-danger">Critical (25)</span></td>
+                                    <td><span class="badge rounded-pill bg-warning text-dark">Open</span></td>
+                                </tr>
+                                <tr>
+                                    <td>RSK-103</td>
+                                    <td>Expired SSL cert on Main Portal</td>
+                                    <td><span class="badge bg-warning text-dark">Medium (12)</span></td>
+                                    <td><span class="badge rounded-pill bg-success">Mitigated</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- quick action card, this is just to fill the space looked emtpy-->
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="bi bi-lightning-charge me-2"></i>Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush">
+                            <a href="assets.html" class="list-group-item list-group-item-action"><i
+                                    class="bi bi-search me-2"></i> Browse Asset Register</a>
+                            <a href="add_mitigation.html" class="list-group-item list-group-item-action"><i
+                                    class="bi bi-shield-plus me-2"></i> Record New Mitigation</a>
+                            <a href="audit_logs.html" class="list-group-item list-group-item-action"><i
+                                    class="bi bi-journal-text me-2"></i> Review Audit Trail</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
