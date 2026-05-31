@@ -1,0 +1,11 @@
+{
+  "name": "risk-whisperers",
+  "version": "1.0.0",
+  "description": "Asset Risk Management System",
+  "scripts": {
+    "lint": "eslint *.js"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0"
+  }
+}
