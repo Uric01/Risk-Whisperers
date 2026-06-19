@@ -9,19 +9,7 @@ from django.contrib.auth import get_user_model
 
 
 def index(request):
-    if not request.user.is_authenticated:
-        return redirect("login")
-    
-    # Redirect authenticated users to appropriate dashboard
-    if request.user.groups.filter(name='Risk_Manager').exists():
-        return render(request, 'users/add_risk.html')
-    elif request.user.groups.filter(name='Auditor').exists():
-        return redirect('audit_logs')
-    elif request.user.groups.filter(name='Admin').exists() or request.user.is_staff:
-        return redirect('dashboard')
-    
-    # Default redirect if user has no groups
-    return redirect('dashboard')
+     return render(request,"templates/risk_whisperers/login.html")
     
 
 def login_view(request):
@@ -29,24 +17,25 @@ def login_view(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
-        
-        if user is not None:
-            login(request, user)
+        return redirect('index')
+    
+       # if user is not None:
+        #    login(request, user)
             
             # Route to appropriate dashboard based on group
-            if user.groups.filter(name='Risk_Manager').exists():
-                return render(request, 'risk_whisperers/add_risk.html')
-            elif user.groups.filter(name='Auditor').exists():
-                return render(request, 'users/audit_logs.html')
-            elif user.groups.filter(name='Admin').exists() or user.is_staff:
-                return render(request, 'users/dashboard.html')
-            
+            #if user.groups.filter(name='Admin').exists() or user.is_staff:
+            #    return render(request, 'users/dashboard.html')
+            #elif user.groups.filter(name='Auditor').exists():
+            #    return render(request, 'users/audit_logs.html')
+            #elif user.groups.filter(name='Risk_Manager').exists():
+            #    return render(request, 'risk_whisperers/add_risk.html')
+            #
             # Default redirect
-            return redirect('index')
-        else:
-            return render(request, 'users/login.html', {"error": "Invalid username or password"})
+            
+        #else:
+       #     return render(request, 'users/login.html', {"error": "Invalid username or password"})
     
-    return render(request, 'users/login.html')
+    #return render(request, 'users/login.html')
 
 
 def logout_view(request):
