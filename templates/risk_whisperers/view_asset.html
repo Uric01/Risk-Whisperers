@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Details - RiskSys</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../assets/style.css">
+    <!-- PYTHON: @login_required
+         GET id from URL: /assets/<int:asset_id>
+         SELECT asset with JOINs to category, status, classification
+         404 + flash if not found
+         Pass asset dict/object to template -->
+</head>
+<body>
+<nav class="navbar navbar-dark bg-dark mb-4">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="dashboard.html">RiskSys</a>
+        <a href="assets.html" class="btn btn-outline-light btn-sm">Back to Register</a>
+    </div>
+</nav>
+<div class="container">
+
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h2>Asset Details</h2>
+        <!-- PYTHON: Asset ID {{ asset.id }} -->
+        <p class="text-muted mb-0">Asset ID 1</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="assets.html" class="btn btn-light border">Back</a>
+        <!-- PYTHON: {% if session.role == "Admin" %} -->
+        <a href="edit_asset.html" class="btn btn-primary">Edit</a>
+        <a href="add_risk.html" class="btn btn-danger">Add Risk</a>
+        <!-- PYTHON: add_risk with ?asset_id={{ asset.id }} -->
+        <!-- PYTHON: {% endif %} -->
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <!-- PYTHON: render fields from asset model — escape all user text -->
+            <dt class="col-sm-3">Asset Name</dt>
+            <dd class="col-sm-9">Production Server A</dd>
+            <dt class="col-sm-3">Description</dt>
+            <dd class="col-sm-9">Main SCADA application host.</dd>
+            <dt class="col-sm-3">Category</dt>
+            <dd class="col-sm-9">IT</dd>
+            <dt class="col-sm-3">Owner</dt>
+            <dd class="col-sm-9">Jane Smith</dd>
+            <dt class="col-sm-3">Location</dt>
+            <dd class="col-sm-9">Plant Floor 1</dd>
+            <dt class="col-sm-3">Operational Status</dt>
+            <dd class="col-sm-9">Active</dd>
+            <dt class="col-sm-3">Classification</dt>
+            <dd class="col-sm-9">Internal</dd>
+            <dt class="col-sm-3">Confidentiality Impact</dt>
+            <dd class="col-sm-9">High</dd>
+            <dt class="col-sm-3">Integrity Impact</dt>
+            <dd class="col-sm-9">Medium</dd>
+            <dt class="col-sm-3">Availability Impact</dt>
+            <dd class="col-sm-9">High</dd>
+        </dl>
+    </div>
+</div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
