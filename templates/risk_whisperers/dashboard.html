@@ -1,177 +1,197 @@
 <!DOCTYPE html>
-{% load static %}
 <html lang="en" data-bs-theme="light">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Asset Risk Management System</title>
+    <title>Dashboard - RiskSys</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link rel="stylesheet" href="../assets/style.css">
+    <!-- PYTHON: @login_required decorator on route
+         Query aggregates: COUNT assets, COUNT risks, COUNT open risks, COUNT completed mitigations
+         Query recent risks: ORDER BY created_at DESC LIMIT 5
+         Pass stats and recent_risks to template -->
 </head>
-
 <body>
-    <!-- Nav bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="dashboard.html">
-                <i class="bi bi-shield-check me-2 text-info"></i>RiskSys
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link active" href="dashboard.html">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="assets.html">Assets</a></li>
-                    <li class="nav-item"><a class="nav-link" href="risks.html">Risks</a></li>
-                    <li class="nav-item"><a class="nav-link" href="add_mitigation.html">Mitigations</a></li>
-                    <li class="nav-item"><a class="nav-link" href="reports.html">Reports</a></li>
-                    <li class="nav-item"><a class="nav-link" href="audit_logs.html">Audit Logs</a></li>
-                </ul>
-                <div class="d-flex align-items-center">
-                    <span id="navUserDisplay" class="text-light me-3"><i class="bi bi-person-circle me-1"></i> Admin
-                        User</span>
-                    <a href="login.html" class="btn btn-outline-light btn-sm">Logout</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- main content  area-->
-    <div class="container mt-4">
-        <div class="page-header d-flex justify-content-between align-items-center">
-            <div>
-                <h2>Welcome</h2>
-                <p class="text-muted mb-0">Here's an overview of your asset risks today.</p>
-            </div>
-            <div>
-                <a href="add_asset.html" class="btn btn-primary me-2"><i class="bi bi-plus-circle me-1"></i>
-                    Add
-                    Asset</a>
-                <a href="add_risk.html" class="btn btn-danger me-2"><i
-                        class="bi bi-exclamation-triangle me-1"></i> Add
-                    Risk</a>
-                <a href="reports.html" class="btn btn-outline-secondary"><i
-                        class="bi bi-file-earmark-bar-graph me-1"></i> View Reports</a>
-            </div>
-        </div>
-
-        <!-- summary cards this data from db with calculation -->
-        <div class="row g-4 mb-5">
-            <div class="col-md-3">
-                <div class="card summary-card bg-primary text-white h-100">
-                    <div class="card-body d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-title mb-1">Total Assets</h6>
-                            <h2 class="mb-0 fw-bold">1,245</h2>
-                        </div>
-                        <i class="bi bi-boxes card-icon"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card summary-card bg-danger text-white h-100">
-                    <div class="card-body d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-title mb-1">Total Risks</h6>
-                            <h2 class="mb-0 fw-bold">342</h2>
-                        </div>
-                        <i class="bi bi-exclamation-octagon card-icon"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card summary-card bg-warning text-dark h-100">
-                    <div class="card-body d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-title mb-1">Open Risks</h6>
-                            <h2 class="mb-0 fw-bold">89</h2>
-                        </div>
-                        <i class="bi bi-hourglass-split card-icon text-dark"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card summary-card bg-success text-white h-100">
-                    <div class="card-body d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-title mb-1">Completed Mitigations</h6>
-                            <h2 class="mb-0 fw-bold">156</h2>
-                        </div>
-                        <i class="bi bi-check-circle card-icon"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- recent activity section  - we should pull data from db to fill this, maybe recent for the week-->
-        <div class="row">
-            <div class="col-md-8">
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Recent Risks</h5>
-                        <a href="risks.html" class="btn btn-sm btn-outline-primary">View All</a>
-                    </div>
-                    <div class="card-body p-0">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Risk ID</th>
-                                    <th>Description</th>
-                                    <th>Rating</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>RSK-101</td>
-                                    <td>Server room AC failure potential</td>
-                                    <td><span class="badge bg-danger">High (20)</span></td>
-                                    <td><span class="badge rounded-pill bg-warning text-dark">Open</span></td>
-                                </tr>
-                                <tr>
-                                    <td>RSK-102</td>
-                                    <td>Database out of disk space</td>
-                                    <td><span class="badge bg-danger">Critical (25)</span></td>
-                                    <td><span class="badge rounded-pill bg-warning text-dark">Open</span></td>
-                                </tr>
-                                <tr>
-                                    <td>RSK-103</td>
-                                    <td>Expired SSL cert on Main Portal</td>
-                                    <td><span class="badge bg-warning text-dark">Medium (12)</span></td>
-                                    <td><span class="badge rounded-pill bg-success">Mitigated</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <!-- quick action card, this is just to fill the space looked emtpy-->
-            <div class="col-md-4">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="bi bi-lightning-charge me-2"></i>Quick Actions</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="list-group list-group-flush">
-                            <a href="assets.html" class="list-group-item list-group-item-action"><i
-                                    class="bi bi-search me-2"></i> Browse Asset Register</a>
-                            <a href="add_mitigation.html" class="list-group-item list-group-item-action"><i
-                                    class="bi bi-shield-plus me-2"></i> Record New Mitigation</a>
-                            <a href="audit_logs.html" class="list-group-item list-group-item-action"><i
-                                    class="bi bi-journal-text me-2"></i> Review Audit Trail</a>
-                        </div>
-                    </div>
-                </div>
+<!-- PYTHON: {% include "partials/navbar.html" %} — session.full_name, role-based links -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="dashboard.html"><i class="bi bi-shield-check me-2 text-info"></i>RiskSys</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link active" href="dashboard.html">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="assets.html">Assets</a></li>
+                <li class="nav-item"><a class="nav-link" href="risks.html">Risks</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Mitigations</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="mitigations.html"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
+                        <!-- PYTHON: {% if session.role == "Admin" %} -->
+                        <li><a class="dropdown-item" href="add_mitigation.html"><i class="bi bi-plus-circle me-2"></i>Add</a></li>
+                        <!-- PYTHON: {% endif %} -->
+                    </ul>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="reports.html">Reports</a></li>
+                <!-- PYTHON: {% if session.role == "Admin" %} -->
+                <li class="nav-item"><a class="nav-link" href="audit_logs.html">Audit Logs</a></li>
+                <li class="nav-item"><a class="nav-link" href="user_management.html">User Management</a></li>
+                <!-- PYTHON: {% endif %} -->
+            </ul>
+            <div class="d-flex align-items-center">
+                <!-- PYTHON: {{ session.full_name }} -->
+                <span class="text-light me-3"><i class="bi bi-person-circle me-1"></i>Admin User</span>
+                <a href="login.html" class="btn btn-outline-light btn-sm">Logout</a>
             </div>
         </div>
     </div>
+</nav>
+<div class="container mt-4">
+    <!-- PYTHON: flash messages partial -->
 
-    <!-- Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <!-- PYTHON: Welcome, {{ session.full_name }} -->
+        <h2>Welcome, Admin User</h2>
+        <p class="text-muted mb-0">Overview of your asset risks.</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2 justify-content-end">
+        <a href="assets.html" class="btn btn-outline-primary">View Assets</a>
+        <a href="reports.html" class="btn btn-outline-secondary">View Reports</a>
+        <a href="mitigations.html" class="btn btn-outline-success">Mitigations</a>
+        <!-- PYTHON: {% if session.role == "Admin" %} -->
+        <a href="add_asset.html" class="btn btn-primary">Add Asset</a>
+        <a href="add_risk.html" class="btn btn-danger">Add Risk</a>
+        <!-- PYTHON: {% endif %} -->
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <!-- PYTHON: {% for card in summary_cards %} — loop from view with href and counts from DB -->
+    <div class="col-md-3">
+        <a href="assets.html" class="text-decoration-none text-white">
+            <div class="card summary-card bg-primary h-100">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div><h6>Total Assets</h6><h2>12</h2></div>
+                    <i class="bi bi-boxes card-icon"></i>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="risks.html" class="text-decoration-none text-white">
+            <div class="card summary-card bg-danger h-100">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div><h6>Total Risks</h6><h2>8</h2></div>
+                    <i class="bi bi-exclamation-octagon card-icon"></i>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="risks.html" class="text-decoration-none text-dark">
+            <div class="card summary-card bg-warning text-dark h-100">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div><h6>Open Risks</h6><h2>5</h2></div>
+                    <i class="bi bi-hourglass-split card-icon"></i>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="mitigations.html" class="text-decoration-none text-white">
+            <div class="card summary-card bg-success h-100">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div><h6>Completed Mitigations</h6><h2>3</h2></div>
+                    <i class="bi bi-check-circle card-icon"></i>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="row g-4 mt-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Risks</h5>
+                <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Risk ID</th>
+                        <th>Description</th>
+                        <th>Rating</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>RSK-101</td>
+                        <td>Unauthorized access to control network</td>
+                        <td class="risk-rating" data-score="15"> High 15</span></td>
+                        <td><span class="badge bg-warning text-dark">Open</span></td>
+                    </tr>
+                    <tr>
+                        <td>RSK-100</td>
+                        <td>Legacy firmware on PLC</td>
+                        <td class="risk-rating" data-score="12"> Medium 12</span></td>
+                        <td><span class="badge bg-warning text-dark">Open</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-lightning"></i> Quick Actions
+                </h5>
+            </div>
+
+            <div class="list-group list-group-flush">
+                <a href="assets.html" class="list-group-item list-group-item-action">
+                    <i class="bi bi-search me-2"></i> Browse Asset Register
+                </a>
+                <a href="add_mitigation.html" class="list-group-item list-group-item-action">
+                    <i class="bi bi-shield-plus me-2"></i> Record New Mitigation
+                </a>
+                <a href="audit_logs.html" class="list-group-item list-group-item-action">
+                    <i class="bi bi-list-check me-2"></i> Review Audit Logs
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.querySelectorAll('.risk-rating').forEach(cell => {
+    const score = parseInt(cell.dataset.score);
+
+    let text = "Low";
+    let cls = "bg-success";
+
+    if (score >= 20) {
+        text = "Critical";
+        cls = "bg-danger";
+    } else if (score >= 15) {
+        text = "High";
+        cls = "bg-danger";
+    } else if (score >= 10) {
+        text = "Medium";
+        cls = "bg-warning text-dark";
+    }
+
+    cell.innerHTML = `<span class="badge ${cls}">${text} (${score})</span>`;
+});
+</script>
 </body>
-
 </html>

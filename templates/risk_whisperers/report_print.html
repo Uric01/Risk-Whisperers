@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RiskSys Report</title>
+    <!-- PYTHON: This page mirrors report_export.php / route @app.route("/reports/export")
+         format=excel: return send_file CSV or Response with text/csv Content-Disposition attachment
+         format=pdf: render this template with summary + rows OR use library (ReportLab, WeasyPrint)
+         Pass same filtered report_rows and summary as reports page
+         No navbar — print-only layout -->
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2rem; color: #222; }
+        h1 { font-size: 1.4rem; }
+        .meta { color: #555; margin-bottom: 1.5rem; }
+        .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+        .summary div { border: 1px solid #ccc; padding: 0.75rem; border-radius: 6px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
+        th { background: #f5f5f5; }
+        @media print { .no-print { display: none; } }
+    </style>
+</head>
+<body>
+    <p class="no-print"><button onclick="window.print()">Print / Save as PDF</button></p>
+    <h1>Reports & Compliance View</h1>
+    <!-- PYTHON: Generated {{ datetime.now().strftime("%Y-%m-%d %H:%M") }} -->
+    <p class="meta">Generated 2026-05-28 12:00</p>
+
+    <div class="summary">
+        <div><p>Total Assets</p><h3>12</h3></div>
+        <div><p>Total Risks</p><h3>8</h3></div>
+        <div><p>Open Risks</p><h3>5</h3></div>
+        <div><p>Overdue Mitigations</p><h3>2</h3></div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Category</th><th>Asset</th><th>Risk ID</th>
+                <th>Rating</th><th>Status</th><th>Target Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- PYTHON: {% for row in report_rows %} -->
+            <tr>
+                <td>IT</td>
+                <td>Production Server A</td>
+                <td>RSK-101</td>
+                <td>15</td>
+                <td>Open</td>
+                <td>2026-05-15</td>
+            </tr>
+            <!-- PYTHON: {% endfor %} -->
+        </tbody>
+    </table>
+    <!-- PYTHON: Optional: window.print() on load for PDF export UX -->
+</body>
+</html>

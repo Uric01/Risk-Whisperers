@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Risk - RiskSys</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/style.css">
+    <!-- PYTHON: @admin_required
+         GET /risks/<id>/edit — load risk, selected control ids, lookup lists
+         POST: UPDATE risks; DELETE + re-INSERT risk_annex_controls; audit_log UPDATE -->
+</head>
+<body>
+<nav class="navbar navbar-dark bg-dark mb-4">
+    <div class="container-fluid"><a class="navbar-brand" href="dashboard.html">RiskSys</a></div>
+</nav>
+<div class="container">
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-danger border-top border-4">
+            <div class="card-header bg-white">
+                <h4 class="text-danger">Edit Risk</h4>
+                <p class="text-muted mb-0 small">RSK-101</p>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    <input type="hidden" name="risk_id" value="101">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Asset *</label>
+                        <select name="asset_id" class="form-select" required>
+                            <option value="1" selected>Production Server A</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Risk Description *</label>
+                        <textarea name="risk_description" class="form-control" required>Unauthorized access to control network</textarea>
+                    </div>
+                    <div class="row bg-light rounded p-3 mb-4 mx-0 border">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Likelihood *</label>
+                            <select name="likelihood" id="likelihood" class="form-select">
+                                <option value="3" selected>3</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Impact *</label>
+                            <select name="impact" id="impact" class="form-select">
+                                <option value="5" selected>5</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Risk Rating</label>
+                            <input type="text" id="risk_rating_display" class="form-control" readonly value="15">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Status</label>
+                            <select name="risk_status_id" class="form-select">
+                                <option selected>Open</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Treatment *</label>
+                            <select name="treatment_option_id" class="form-select" required>
+                                <option selected>Mitigate</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Review Date</label>
+                            <input type="date" name="review_date" class="form-control" value="2026-06-01">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Annex Controls</label>
+                        <select name="control_ids" class="form-select" multiple>
+                            <option value="1" selected>A.5.1 Policies</option>
+                        </select>
+                    </div>
+                    <div class="text-end">
+                        <a href="view_risk.html" class="btn btn-light border">Cancel</a>
+                        <button class="btn btn-danger">Update Risk</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+<script>
+(function () {
+    const l = document.getElementById('likelihood'), i = document.getElementById('impact'), r = document.getElementById('risk_rating_display');
+    function u() { r.value = String(parseInt(l.value,10)*parseInt(i.value,10)); }
+    l.addEventListener('change', u); i.addEventListener('change', u);
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
