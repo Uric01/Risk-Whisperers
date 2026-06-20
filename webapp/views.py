@@ -20,6 +20,7 @@ ALLOWED_PAGES = {
     'report_print': 'risk_whisperers/report_print.html',
     'view_risk': 'risk_whisperers/view_risk.html',
     'view_asset': 'risk_whisperers/view_asset.html',
+    'mitigations': 'risk_whisperers/mitigations.html',
 }
 
 

@@ -16,28 +16,28 @@
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="assets.html">Assets</a></li>
-                    <li class="nav-item"><a class="nav-link" href="risks.html">Risks</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'page' 'dashboard' %}">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="{% url 'page' 'assets' %}">Assets</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'page' 'risks' %}">Risks</a></li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Mitigations</a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="mitigations.html"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
+                            <li><a class="dropdown-item" href="{% url 'page' 'edit_mitigation' %}"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
                             <!-- PYTHON: {% if session.role == "Admin" %} -->
-                            <li><a class="dropdown-item" href="add_mitigation.html"><i class="bi bi-plus-circle me-2"></i>Add</a></li>
+                            <li><a class="dropdown-item" href="{% url 'page' 'add_mitigation' %}"><i class="bi bi-plus-circle me-2"></i>Add</a></li>
                             <!-- PYTHON: {% endif %} -->
                         </ul>
                     </li>
-                    <li class="nav-item"><a class="nav-link" href="reports.html">Reports</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
                     <!-- PYTHON: {% if session.role == "Admin" %} -->
-                    <li class="nav-item"><a class="nav-link" href="audit_logs.html">Audit Logs</a></li>
-                    <li class="nav-item"><a class="nav-link" href="user_management.html">User Management</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'page' 'audit_logs' %}">Audit Logs</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'page' 'user_management' %}">User Management</a></li>
                     <!-- PYTHON: {% endif %} -->
                 </ul>
                 <div class="d-flex align-items-center">
                     <!-- PYTHON: {{ session.full_name }} -->
                     <span class="text-light me-3"><i class="bi bi-person-circle me-1"></i>Admin User</span>
-                    <a href="login.html" class="btn btn-outline-light btn-sm">Logout</a>
+                    <a href="{% url 'page' 'login' %}" class="btn btn-outline-light btn-sm">Logout</a>
                 </div>
             </div>
         </div>
@@ -50,7 +50,7 @@
         <p class="text-muted mb-0">Manage registered assets.</p>
     </div>
     <!-- PYTHON: {% if session.role == "Admin" %} -->
-    <a href="add_asset.html" class="btn btn-primary">Capture New Asset</a>
+    <a href="{% url 'page' 'add_asset' %}" class="btn btn-primary">Capture New Asset</a>
     <!-- PYTHON: {% endif %} -->
 </div>
 
@@ -104,12 +104,10 @@
                     <td>Plant Floor 1</td>
                     <td>Active</td>
                     <td class="text-end text-nowrap">
-                        <a class="btn btn-sm btn-outline-secondary" href="view_asset.html">View</a>
-                        {# PYTHON: href=url_for("view_asset", id=asset.id) #}
+                        <a class="btn btn-sm btn-outline-secondary" href="{% url 'page' 'view_asset' %}?id={{ asset.id }}">View</a>
                         {# PYTHON: {% if session.role == "Admin" %} #}
-                        <a class="btn btn-sm btn-outline-primary" href="edit_asset.html">Edit</a>
-                        <a class="btn btn-sm btn-outline-danger" href="add_risk.html">Add Risk</a>
-                        {# PYTHON: add_risk?asset_id={{ asset.id }} #}
+                        <a class="btn btn-sm btn-outline-primary" href="{% url 'page' 'edit_asset' %}?id={{ asset.id }}">Edit</a>
+                        <a class="btn btn-sm btn-outline-danger" href="{% url 'page' 'add_risk' %}?asset_id={{ asset.id }}">Add Risk</a>
                         {# PYTHON: {% endif %} #}
                     </td>
                 </tr>

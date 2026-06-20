@@ -67,7 +67,7 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- PYTHON: {% for m in mitigations %} -->
+                {# PYTHON: {% for m in mitigations %} #}
                 <tr>
                     <td>MIT-1</td>
                     <td>RSK-101: Unauthorized access to control network</td>
@@ -77,12 +77,12 @@
                     <td>In Progress</td>
                     <td>2026-07-01</td>
                     <td class="text-end">
-                        <!-- PYTHON: {% if session.role == "Admin" %} -->
+                        {# PYTHON: {% if session.role == "Admin" %} #}
                         <a class="btn btn-sm btn-outline-primary" href="edit_mitigation.html">Edit</a>
-                        <!-- PYTHON: url_for("edit_mitigation", id=m.id) {% endif %} -->
+                        {# PYTHON: url_for("edit_mitigation", id=m.id) {% endif %} #}
                     </td>
                 </tr>
-                <!-- PYTHON: {% else %}<tr><td colspan="8" class="text-center text-muted py-4">No mitigations yet</td></tr>{% endfor %} -->
+                {# PYTHON: {% else %}<tr><td colspan="8" class="text-center text-muted py-4">No mitigations yet</td></tr>{% endfor %} #}
             </tbody>
         </table>
     </div>
