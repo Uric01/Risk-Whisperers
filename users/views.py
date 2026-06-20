@@ -7,11 +7,11 @@ from django.urls import reverse
 from django.contrib.auth.models import Group, User
 from django.contrib.auth import get_user_model
 from django.contrib import messages
+from webapp.views import page
 
 
 def index(request):
-     return render(request,"risk_whisperers/login.html")
-    
+     return redirect('page', 'login')
 
 def login_view(request):
     if request.method == 'POST':
@@ -24,10 +24,10 @@ def login_view(request):
         if user is not None:
            login(request, user)
            messages.success(request, "Login successful.")
-           return render(request, 'risk_whisperers/dashboard.html')
+           return redirect('page', 'dashboard')
         else:
             messages.error(request, "Invalid username or password.")
-            return render(request, 'risk_whisperers/login.html')
+            return redirect('login')
     return render(request, 'risk_whisperers/login.html')
 
 
