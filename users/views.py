@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 
 
 def index(request):
-     return render(request,"templates/risk_whisperers/login.html")
+     return render(request,"users/login.html")
     
 
 def login_view(request):
@@ -17,7 +17,7 @@ def login_view(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
-        return redirect('index')
+        return redirect('dashboard')  # Redirect to the dashboard page after successful login
     
        # if user is not None:
         #    login(request, user)

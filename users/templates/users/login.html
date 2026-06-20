@@ -29,7 +29,7 @@
                     {{ error }}
                 </div>
             {% endif %}
-            <form id="loginForm" method="post" action = "{% url 'login' %}">
+            <form id="loginForm" method="post" action="{% url 'page' 'dashboard' %}">
                 {% csrf_token %}<!-- Django template tag for CSRF protection -->
                 <div id="errorMsg" class="alert alert-danger d-none" role="alert">
                     Please enter username and password.
