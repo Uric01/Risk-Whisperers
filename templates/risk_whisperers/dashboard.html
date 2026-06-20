@@ -13,7 +13,7 @@
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="dashboard.html"><i class="bi bi-shield-check me-2 text-info"></i>RiskSys</a>
+        <a class="navbar-brand" href="{% url 'page' 'dashboard' %}"><i class="bi bi-shield-check me-2 text-info"></i>RiskSys</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -23,7 +23,7 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Mitigations</a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{% url 'page' 'mitigations' %}"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
+                        <li><a class="dropdown-item" href="{% url 'page' 'edit_mitigation' %}"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
                         <!-- PYTHON: {% if session.role == "Admin" %} -->
                         <li><a class="dropdown-item" href="{% url 'page' 'add_mitigation' %}"><i class="bi bi-plus-circle me-2"></i>Add</a></li>
                         <!-- PYTHON: {% endif %} -->
