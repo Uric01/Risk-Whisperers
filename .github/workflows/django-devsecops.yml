@@ -52,7 +52,7 @@ jobs:
     # 5. pip-audit (dependency scan)
     # -------------------------
     - name: Run pip-audit
-      run: pip-audit
+      run: pip-audit --desc
 
 
     # -------------------------
