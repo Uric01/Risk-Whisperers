@@ -17,28 +17,28 @@
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link active" href="dashboard.html">Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link" href="assets.html">Assets</a></li>
-                <li class="nav-item"><a class="nav-link" href="risks.html">Risks</a></li>
+                <li class="nav-item"><a class="nav-link active" href="{% url 'page' 'dashboard' %}">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'assets' %}">Assets</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'risks' %}">Risks</a></li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Mitigations</a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="mitigations.html"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
+                        <li><a class="dropdown-item" href="{% url 'page' 'mitigations' %}"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
                         <!-- PYTHON: {% if session.role == "Admin" %} -->
-                        <li><a class="dropdown-item" href="add_mitigation.html"><i class="bi bi-plus-circle me-2"></i>Add</a></li>
+                        <li><a class="dropdown-item" href="{% url 'page' 'add_mitigation' %}"><i class="bi bi-plus-circle me-2"></i>Add</a></li>
                         <!-- PYTHON: {% endif %} -->
                     </ul>
                 </li>
-                <li class="nav-item"><a class="nav-link" href="reports.html">Reports</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
                 <!-- PYTHON: {% if session.role == "Admin" %} -->
-                <li class="nav-item"><a class="nav-link" href="audit_logs.html">Audit Logs</a></li>
-                <li class="nav-item"><a class="nav-link" href="user_management.html">User Management</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'audit_logs' %}">Audit Logs</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'user_management' %}">User Management</a></li>
                 <!-- PYTHON: {% endif %} -->
             </ul>
             <div class="d-flex align-items-center">
                 <!-- PYTHON: {{ session.full_name }} -->
                 <span class="text-light me-3"><i class="bi bi-person-circle me-1"></i>Admin User</span>
-                <a href="login.html" class="btn btn-outline-light btn-sm">Logout</a>
+                <a href="{% url 'page' 'login' %}" class="btn btn-outline-light btn-sm">Logout</a>
             </div>
         </div>
     </div>
@@ -53,12 +53,12 @@
         <p class="text-muted mb-0">Overview of your asset risks.</p>
     </div>
     <div class="d-flex flex-wrap gap-2 justify-content-end">
-        <a href="assets.html" class="btn btn-outline-primary">View Assets</a>
-        <a href="reports.html" class="btn btn-outline-secondary">View Reports</a>
-        <a href="mitigations.html" class="btn btn-outline-success">Mitigations</a>
+        <a href="{% url 'page' 'assets' %}" class="btn btn-outline-primary">View Assets</a>
+        <a href="{% url 'page' 'reports' %}" class="btn btn-outline-secondary">View Reports</a>
+        <a href="{% url 'page' 'mitigations' %}" class="btn btn-outline-success">Mitigations</a>
         <!-- PYTHON: {% if session.role == "Admin" %} -->
-        <a href="add_asset.html" class="btn btn-primary">Add Asset</a>
-        <a href="add_risk.html" class="btn btn-danger">Add Risk</a>
+        <a href="{% url 'page' 'add_asset' %}" class="btn btn-primary">Add Asset</a>
+        <a href="{% url 'page' 'add_risk' %}" class="btn btn-danger">Add Risk</a>
         <!-- PYTHON: {% endif %} -->
     </div>
 </div>
@@ -66,7 +66,7 @@
 <div class="row g-4 mb-5">
     {# PYTHON: {% for card in summary_cards %} — loop from view with href and counts from DB #}
     <div class="col-md-3">
-        <a href="assets.html" class="text-decoration-none text-white">
+        <a href="{% url 'page' 'assets' %}" class="text-decoration-none text-white">
             <div class="card summary-card bg-primary h-100">
                 <div class="card-body d-flex justify-content-between align-items-center">
                     <div><h6>Total Assets</h6><h2>12</h2></div>
@@ -76,7 +76,7 @@
         </a>
     </div>
     <div class="col-md-3">
-        <a href="risks.html" class="text-decoration-none text-white">
+        <a href="{% url 'page' 'risks' %}" class="text-decoration-none text-white">
             <div class="card summary-card bg-danger h-100">
                 <div class="card-body d-flex justify-content-between align-items-center">
                     <div><h6>Total Risks</h6><h2>8</h2></div>
@@ -86,7 +86,7 @@
         </a>
     </div>
     <div class="col-md-3">
-        <a href="risks.html" class="text-decoration-none text-dark">
+        <a href="{% url 'page' 'risks' %}" class="text-decoration-none text-dark">
             <div class="card summary-card bg-warning text-dark h-100">
                 <div class="card-body d-flex justify-content-between align-items-center">
                     <div><h6>Open Risks</h6><h2>5</h2></div>
@@ -96,7 +96,7 @@
         </a>
     </div>
     <div class="col-md-3">
-        <a href="mitigations.html" class="text-decoration-none text-white">
+        <a href="{% url 'page' 'mitigations' %}" class="text-decoration-none text-white">
             <div class="card summary-card bg-success h-100">
                 <div class="card-body d-flex justify-content-between align-items-center">
                     <div><h6>Completed Mitigations</h6><h2>3</h2></div>
@@ -152,13 +152,13 @@
             </div>
 
             <div class="list-group list-group-flush">
-                <a href="assets.html" class="list-group-item list-group-item-action">
+                <a href="{% url 'page' 'dashboard' %}" class="list-group-item list-group-item-action">
                     <i class="bi bi-search me-2"></i> Browse Asset Register
                 </a>
-                <a href="add_mitigation.html" class="list-group-item list-group-item-action">
+                <a href="{% url 'page' 'add_mitigation' %}" class="list-group-item list-group-item-action">
                     <i class="bi bi-shield-plus me-2"></i> Record New Mitigation
                 </a>
-                <a href="audit_logs.html" class="list-group-item list-group-item-action">
+                <a href="{% url 'page' 'audit_logs' %}" class="list-group-item list-group-item-action">
                     <i class="bi bi-list-check me-2"></i> Review Audit Logs
                 </a>
             </div>
