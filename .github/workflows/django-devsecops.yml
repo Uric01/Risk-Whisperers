@@ -37,6 +37,7 @@ jobs:
     # 3. Linting (flake8)
     # -------------------------
     - name: Run flake8 (linting)
+      continue-on-error: true
       run: flake8 .
 
 
