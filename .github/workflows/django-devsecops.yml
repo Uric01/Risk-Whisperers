@@ -61,10 +61,9 @@ jobs:
     - name: Install Snyk CLI
       run: npm install -g snyk
 
-    - name: Authenticate Snyk
-      run: snyk auth ${{ secrets.SNYK_TOKEN }}
-
     - name: Run Snyk test
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       run: snyk test --severity-threshold=high
 
 
