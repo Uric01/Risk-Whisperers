@@ -32,4 +32,12 @@ def page(request, page_name):
     template = ALLOWED_PAGES.get(page_name)
     if not template:
         raise Http404('Page not found')
-    return render(request, template)
+    user = request.user
+    context = {
+        "is_admin": user.groups.filter(name="Admin").exists() if user.is_authenticated else False,
+        "is_risk_manager": user.groups.filter(name="Risk_Manager").exists() if user.is_authenticated else False,
+        "is_auditor": user.groups.filter(name="Auditor").exists() if user.is_authenticated else False,
+        "is_viewer": user.groups.filter(name="viewer").exists() if user.is_authenticated else False,
+        "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
+    }
+    return render(request, template, context)
