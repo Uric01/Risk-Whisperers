@@ -27,7 +27,6 @@ ALLOWED_PAGES = {
 def home(request):
     return render(request, ALLOWED_PAGES['login'])
 
-
 def page(request, page_name):
     template = ALLOWED_PAGES.get(page_name)
     if not template:
