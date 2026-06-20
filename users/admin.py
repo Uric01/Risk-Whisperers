@@ -1,15 +1,14 @@
 from django.contrib import admin
 
+
 class UserAdmin(admin.ModelAdmin):
     
-    list_display = (
-        'username', 'email', 'first_name', 'last_name', 'is_staff', 'is_active'
-        )
-    list_filter = (
-        'groups', 'is_staff', 'is_active'
-        )
-    search_fields = ('username', 'email')
     
+    list_display = (
+        'username', 'email', 'first_name', 'last_name', 'is_staff', 'is_active')
+    list_filter = (
+        'groups', 'is_staff', 'is_active')
+    search_fields = ('username', 'email')
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
         ('Personal info', {'fields': ('first_name', 'last_name', 'email')}),
