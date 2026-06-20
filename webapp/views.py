@@ -11,6 +11,15 @@ ALLOWED_PAGES = {
     'reports': 'risk_whisperers/reports.html',
     'audit_logs': 'risk_whisperers/audit_logs.html',
     'login': 'risk_whisperers/login.html',
+    'edit_asset': 'risk_whisperers/edit_asset.html',
+    'edit_risk': 'risk_whisperers/edit_risk.html',
+    'edit_mitigation': 'risk_whisperers/edit_mitigation.html',
+    'user_management': 'risk_whisperers/user_management.html',
+    'index': 'risk_whisperers/index.html',
+    'reports': 'risk_whisperers/reports.html',
+    'report_print': 'risk_whisperers/report_print.html',
+    'view_risk': 'risk_whisperers/view_risk.html',
+    'view_asset': 'risk_whisperers/view_asset.html',
 }
 
 

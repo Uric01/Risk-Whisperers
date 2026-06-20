@@ -59,7 +59,7 @@
     <div class="row g-3">
         <div class="col-md-5">
             <input name="q" class="form-control" placeholder="Search Asset" value="">
-            <!-- PYTHON: value="{{ request.args.q or '' }}" -->
+            {# PYTHON: value="request.args.q or ''" #}
         </div>
         <div class="col-md-3">
             <select name="category_id" class="form-select">
@@ -95,7 +95,7 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- PYTHON: {% for asset in assets %} -->
+                {# PYTHON: {% for asset in assets %} #}
                 <tr>
                     <td>1</td>
                     <td>Production Server A</td>
@@ -105,15 +105,15 @@
                     <td>Active</td>
                     <td class="text-end text-nowrap">
                         <a class="btn btn-sm btn-outline-secondary" href="view_asset.html">View</a>
-                        <!-- PYTHON: href=url_for("view_asset", id=asset.id) -->
-                        <!-- PYTHON: {% if session.role == "Admin" %} -->
+                        {# PYTHON: href=url_for("view_asset", id=asset.id) #}
+                        {# PYTHON: {% if session.role == "Admin" %} #}
                         <a class="btn btn-sm btn-outline-primary" href="edit_asset.html">Edit</a>
                         <a class="btn btn-sm btn-outline-danger" href="add_risk.html">Add Risk</a>
-                        <!-- PYTHON: add_risk?asset_id={{ asset.id }} -->
-                        <!-- PYTHON: {% endif %} -->
+                        {# PYTHON: add_risk?asset_id={{ asset.id }} #}
+                        {# PYTHON: {% endif %} #}
                     </td>
                 </tr>
-                <!-- PYTHON: {% else %} empty state row {% endfor %} -->
+                {# PYTHON: {% else %} empty state row {% endfor %} #}
             </tbody>
         </table>
     </div>
