@@ -17,26 +17,56 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item"><a class="nav-link" href="{% url 'page' 'dashboard' %}">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="{% url 'page' 'assets' %}">Assets</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'page' 'risks' %}">Risks</a></li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Mitigations</a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'page' 'edit_mitigation' %}"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
-                            <!-- PYTHON: {% if session.role == "Admin" %} -->
-                            <li><a class="dropdown-item" href="{% url 'page' 'add_mitigation' %}"><i class="bi bi-plus-circle me-2"></i>Add</a></li>
-                            <!-- PYTHON: {% endif %} -->
-                        </ul>
-                    </li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
-                    <!-- PYTHON: {% if session.role == "Admin" %} -->
-                    <li class="nav-item"><a class="nav-link" href="{% url 'page' 'audit_logs' %}">Audit Logs</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'page' 'user_management' %}">User Management</a></li>
-                    <!-- PYTHON: {% endif %} -->
+                    {% if user.is_authenticated %}
+                        {% if is_admin %}
+                            <li class="nav-item"><a class="nav-link" href="{% url 'page' 'assets' %}">Assets</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'page' 'risks' %}">Risks</a></li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Mitigations</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{% url 'page' 'edit_mitigation' %}"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'page' 'add_mitigation' %}"><i class="bi bi-plus-circle me-2"></i>Add</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'page' 'audit_logs' %}">Audit Logs</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'page' 'user_management' %}">User Management</a></li>
+                        {% elif is_risk_manager %}
+                                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'assets' %}">Assets</a></li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'risks' %}">Risks</a></li>
+                                <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Mitigations</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{% url 'page' 'edit_mitigation' %}"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'page' 'add_mitigation' %}"><i class="bi bi-plus-circle me-2"></i>Add</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
+                        {% elif is_auditor %}
+                                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'assets' %}">Assets</a></li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'audit_logs' %}">Audit Logs</a></li>
+                        {% elif is_viewer %}
+                                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
+                        {% elif is_owner %}
+                            <li class="nav-item"><a class="nav-link" href="{% url 'page' 'assets' %}">Assets</a></li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Mitigations</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{% url 'page' 'edit_mitigation' %}"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'page' 'add_mitigation' %}"><i class="bi bi-plus-circle me-2"></i>Add</a></li>
+                                </ul>
+                            </li>
+                        {% else %}
+
+                            
+                        {% endif %}
+                {% else %}
+
+                {% endif %}
                 </ul>
                 <div class="d-flex align-items-center">
-                    <!-- PYTHON: {{ session.full_name }} -->
-                    <span class="text-light me-3"><i class="bi bi-person-circle me-1"></i>Admin User</span>
+                    <span class="text-light me-3"><i class="bi bi-person-circle me-1"></i>{{ user.username }}</span>
                     <a href="{% url 'page' 'login' %}" class="btn btn-outline-light btn-sm">Logout</a>
                 </div>
             </div>
@@ -45,28 +75,43 @@
 <div class="container mt-4">
 
 <div class="page-header d-flex justify-content-between align-items-center">
-    <div>
-        <h2>Asset Register</h2>
-        <p class="text-muted mb-0">Manage registered assets.</p>
-    </div>
-    <!-- PYTHON: {% if session.role == "Admin" %} -->
-    <a href="{% url 'page' 'add_asset' %}" class="btn btn-primary">Capture New Asset</a>
-    <!-- PYTHON: {% endif %} -->
+
+    {% if user.is_authenticated %}
+                        {% if is_admin %}
+                        <div>
+                            <h2>Asset Register</h2>
+                            <p class="text-muted mb-0">Manage registered assets</p>
+                        </div>
+                            <a href="{% url 'page' 'add_asset' %}" class="btn btn-primary">Capture New Asset</a>
+                        {% elif is_risk_manager %}
+                            <div>
+                            <h2>Asset Register</h2>
+                            <p class="text-muted mb-0">Manage registered assets</p>
+                            </div>
+                               <a href="{% url 'page' 'add_asset' %}" class="btn btn-primary">Capture New Asset</a>
+                        {% elif is_auditor %}
+                                
+                        {% elif is_viewer %}
+                               
+                        {% elif is_owner %}
+                           
+                        {% else %}
+
+                            
+                        {% endif %}
+                {% else %}
+
+                {% endif %}
 </div>
 
-<!-- PYTHON: method="GET" action=url_for("assets") — preserve filters on submit -->
 <form class="card card-body mb-4" method="get">
     <div class="row g-3">
         <div class="col-md-5">
             <input name="q" class="form-control" placeholder="Search Asset" value="">
-            {# PYTHON: value="request.args.q or ''" #}
         </div>
         <div class="col-md-3">
             <select name="category_id" class="form-select">
                 <option value="">All Categories</option>
-                <!-- PYTHON: {% for cat in categories %}
-                <option value="{{ cat.id }}" {% if selected_category == cat.id %}selected{% endif %}>{{ cat.name }}</option>
-                {% endfor %} -->
                 <option>IT</option>
                 <option>OT</option>
                 <option>Infrastructure</option>
@@ -75,7 +120,6 @@
         <div class="col-md-3">
             <select name="status_id" class="form-select">
                 <option value="">All Statuses</option>
-                <!-- PYTHON: loop operational_statuses from DB -->
                 <option>Active</option>
                 <option>Maintenance</option>
                 <option>Retired</option>
@@ -91,11 +135,28 @@
             <thead>
                 <tr>
                     <th>ID</th><th>Name</th><th>Category</th><th>Owner</th><th>Location</th><th>Status</th>
-                    <th class="text-end">Actions</th>
+                    {% if user.is_authenticated %}
+                        {% if is_admin %}
+                             <th class="text-end">Actions</th>
+                        {% elif is_risk_manager %}
+                            <th class="text-end">Actions</th>
+                        {% elif is_auditor %}
+                                
+                        {% elif is_viewer %}
+                               
+                        {% elif is_owner %}
+                           
+                        {% else %}
+
+                            
+                        {% endif %}
+                {% else %}
+
+                {% endif %}
+                    
                 </tr>
             </thead>
             <tbody>
-                {# PYTHON: {% for asset in assets %} #}
                 <tr>
                     <td>1</td>
                     <td>Production Server A</td>
@@ -103,15 +164,34 @@
                     <td>Jane Smith</td>
                     <td>Plant Floor 1</td>
                     <td>Active</td>
-                    <td class="text-end text-nowrap">
-                        <a class="btn btn-sm btn-outline-secondary" href="{% url 'page' 'view_asset' %}?id={{ asset.id }}">View</a>
-                        {# PYTHON: {% if session.role == "Admin" %} #}
-                        <a class="btn btn-sm btn-outline-primary" href="{% url 'page' 'edit_asset' %}?id={{ asset.id }}">Edit</a>
-                        <a class="btn btn-sm btn-outline-danger" href="{% url 'page' 'add_risk' %}?asset_id={{ asset.id }}">Add Risk</a>
-                        {# PYTHON: {% endif %} #}
-                    </td>
+
+                    {% if user.is_authenticated %}
+                        {% if is_admin %}
+                             <td class="text-end text-nowrap">
+                                <a class="btn btn-sm btn-outline-secondary" href="{% url 'page' 'view_asset' %}?id={{ asset.id }}">View</a>
+                                <a class="btn btn-sm btn-outline-primary" href="{% url 'page' 'edit_asset' %}?id={{ asset.id }}">Edit</a>
+                                <a class="btn btn-sm btn-outline-danger" href="{% url 'page' 'add_risk' %}?asset_id={{ asset.id }}">Add Risk</a>
+                            </td>
+                        {% elif is_risk_manager %}
+                             <td class="text-end text-nowrap">
+                                <a class="btn btn-sm btn-outline-secondary" href="{% url 'page' 'view_asset' %}?id={{ asset.id }}">View</a>
+                                <a class="btn btn-sm btn-outline-primary" href="{% url 'page' 'edit_asset' %}?id={{ asset.id }}">Edit</a>
+                                <a class="btn btn-sm btn-outline-danger" href="{% url 'page' 'add_risk' %}?asset_id={{ asset.id }}">Add Risk</a>
+                            </td>
+                        {% elif is_auditor %}
+                                
+                        {% elif is_viewer %}
+                               
+                        {% elif is_owner %}
+                           
+                        {% else %}
+
+                            
+                        {% endif %}
+                {% else %}
+
+                {% endif %}
                 </tr>
-                {# PYTHON: {% else %} empty state row {% endfor %} #}
             </tbody>
         </table>
     </div>
