@@ -49,9 +49,13 @@ TEMPLATES = [
 WSGI_APPLICATION = 'risk_whisperers.wsgi.application'
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+     "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "risksys_db",
+        "USER": "django_user",
+        "PASSWORD": "@Risk@2026",
+        "HOST": "localhost",
+        "PORT": "5432",
     }
 }
 

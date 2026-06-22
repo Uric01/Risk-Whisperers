@@ -113,14 +113,14 @@
             <button type="submit" name="generate" value="1" class="btn btn-primary">Generate Report</button>
             {% if user.is_authenticated %}
                         {% if is_admin %}
-                            <a href="report_print.html" class="btn btn-outline-success" target="_blank">Export Excel</a>
-                            <a href="report_print.html" class="btn btn-outline-danger" target="_blank">Export PDF</a>
+                            <a href="{% url 'page' 'report_print' %}" class="btn btn-outline-success" target="_blank">Export Excel</a>
+                            <a href="{% url 'page' 'report_print' %}" class="btn btn-outline-danger" target="_blank">Export PDF</a>
                         {% elif is_risk_manager %}
-                            <a href="report_print.html" class="btn btn-outline-success" target="_blank">Export Excel</a>
-                            <a href="report_print.html" class="btn btn-outline-danger" target="_blank">Export PDF</a>
+                            <a href="{% url 'page' 'report_print' %}"class="btn btn-outline-success" target="_blank">Export Excel</a>
+                            <a href="{% url 'page' 'report_print' %}" class="btn btn-outline-danger" target="_blank">Export PDF</a>
                         {% elif is_auditor %}
-                            <a href="report_print.html" class="btn btn-outline-success" target="_blank">Export Excel</a>
-                            <a href="report_print.html" class="btn btn-outline-danger" target="_blank">Export PDF</a>
+                            <a href="{% url 'page' 'report_print' %}" class="btn btn-outline-success" target="_blank">Export Excel</a>
+                            <a href="{% url 'page' 'report_print' %}" class="btn btn-outline-danger" target="_blank">Export PDF</a>
                         {% elif is_viewer %}
                                 
                         {% elif is_owner %}
