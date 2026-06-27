@@ -47,6 +47,7 @@
                                 <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
                                 <li class="nav-item"><a class="nav-link" href="{% url 'page' 'audit_logs' %}">Audit Logs</a></li>
                         {% elif is_viewer %}
+                                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'risks' %}">Risks</a></li>
                                 <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
                         {% elif is_owner %}
                             <li class="nav-item"><a class="nav-link" href="{% url 'page' 'assets' %}">Assets</a></li>
@@ -54,7 +55,7 @@
                                 <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Mitigations</a>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="{% url 'page' 'edit_mitigation' %}"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'page' 'add_mitigation' %}"><i class="bi bi-plus-circle me-2"></i>Add</a></li>
+                                    
                                 </ul>
                             </li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
@@ -68,7 +69,7 @@
                 
             </ul>
             <div class="d-flex align-items-center">
-                <span class="text-light me-3"><i class="bi bi-person-circle me-1"></i>{{ user.username }}</span>
+                <span class="text-light me-3"><i class="bi bi-person-circle me-1"></i>{{ user.username }} (Admin)</span>
                 <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Logout</a>
             </div>
         </div>
@@ -87,14 +88,14 @@
             {% if is_admin %}
                 <a href="{% url 'page' 'assets' %}" class="btn btn-outline-primary">View Assets</a>
                 <a href="{% url 'page' 'reports' %}" class="btn btn-outline-secondary">View Reports</a>
-                <a href="{% url 'page' 'mitigations' %}" class="btn btn-outline-success"> View Mitigations</a>
-                <a href="{% url 'page' 'add_asset' %}" class="btn btn-primary">Add Asset</a>
+                <a href="{% url 'view_mitigation' %}" class="btn btn-outline-success"> View Mitigations</a>
+                <a href="{% url 'add_asset' %}" class="btn btn-primary">Add Asset</a>
                 <a href="{% url 'page' 'add_risk' %}" class="btn btn-danger">Add Risk</a>
             {% elif is_risk_manager %}
                 <a href="{% url 'page' 'assets' %}" class="btn btn-outline-primary">View Assets</a>
                 <a href="{% url 'page' 'reports' %}" class="btn btn-outline-secondary">View Reports</a>
                 <a href="{% url 'page' 'mitigations' %}" class="btn btn-outline-success"> View Mitigations</a>
-                <a href="{% url 'page' 'add_asset' %}" class="btn btn-primary">Add Asset</a>
+                <a href=href="{% url 'add_asset' %}" class="btn btn-primary">Add Asset</a>
                 <a href="{% url 'page' 'add_risk' %}" class="btn btn-danger">Add Risk</a>
             {% elif is_auditor %}
                 <a href="{% url 'page' 'assets' %}" class="btn btn-outline-primary">View Assets</a>
@@ -102,6 +103,7 @@
                 <a href="{% url 'page' 'reports' %}" class="btn btn-outline-secondary">View Reports</a>
                 <a href="{% url 'page' 'mitigations' %}" class="btn btn-outline-success"> View Mitigations</a>
             {% elif is_viewer %}
+                <a href="{% url 'page' 'mitigations' %}" class="btn btn-outline-success"> View Mitigations</a>
                 <a href="{% url 'page' 'reports' %}" class="btn btn-outline-secondary">View Reports</a>
             {% elif is_owner %}
                 <a href="{% url 'page' 'assets' %}" class="btn btn-outline-primary">View Assets</a>

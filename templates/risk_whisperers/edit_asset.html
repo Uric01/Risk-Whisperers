@@ -12,9 +12,69 @@
          POST: UPDATE assets SET ... WHERE asset_id=; audit_log UPDATE; redirect assets -->
 </head>
 <body>
-<nav class="navbar navbar-dark bg-dark mb-4">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="dashboard.html">RiskSys</a>
+        <a class="navbar-brand" href="{% url 'page' 'dashboard' %}"><i class="bi bi-shield-check me-2 text-info"></i>RiskSys</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'dashboard' %}">Dashboard</a></li>
+                {% if user.is_authenticated %}
+                        {% if is_admin %}
+                            <li class="nav-item"><a class="nav-link active" href="{% url 'page' 'assets' %}">Assets</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'page' 'risks' %}">Risks</a></li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Mitigations</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{% url 'page' 'edit_mitigation' %}"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'page' 'add_mitigation' %}"><i class="bi bi-plus-circle me-2"></i>Add</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'page' 'audit_logs' %}">Audit Logs</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'page' 'user_management' %}">User Management</a></li>
+                        {% elif is_risk_manager %}
+                                <li class="nav-item"><a class="nav-link active" href="{% url 'page' 'assets' %}">Assets</a></li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'risks' %}">Risks</a></li>
+                                <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Mitigations</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{% url 'page' 'edit_mitigation' %}"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'page' 'add_mitigation' %}"><i class="bi bi-plus-circle me-2"></i>Add</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
+                        {% elif is_auditor %}
+                                <li class="nav-item"><a class="nav-link active" href="{% url 'page' 'assets' %}">Assets</a></li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'audit_logs' %}">Audit Logs</a></li>
+                        {% elif is_viewer %}
+                                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'risks' %}">Risks</a></li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
+                        {% elif is_owner %}
+                            <li class="nav-item"><a class="nav-link active" href="{% url 'page' 'assets' %}">Assets</a></li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Mitigations</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{% url 'page' 'edit_mitigation' %}"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
+                                    
+                                </ul>
+                            </li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
+                        {% else %}
+
+                            
+                        {% endif %}
+                {% else %}
+
+                {% endif %}
+                
+            </ul>
+            <div class="d-flex align-items-center">
+                <span class="text-light me-3"><i class="bi bi-person-circle me-1"></i>{{ user.username }} (Admin)</span>
+                <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Logout</a>
+            </div>
+        </div>
     </div>
 </nav>
 <div class="container">
@@ -24,31 +84,32 @@
         <div class="card shadow-sm">
             <div class="card-header bg-white"><h4>Edit Asset</h4></div>
             <div class="card-body">
-                <form method="post" action="assets.html">
+                <form method="post" action="{% url 'edit_asset' asset.asset %}">
+                    {% csrf_token %}
                     <!-- PYTHON: hidden asset_id; csrf_token -->
-                    <input type="hidden" name="asset_id" value="1">
+                    <input type="hidden" name="asset_id" value="{{ asset.asset }}">
 
                     <div class="mb-3">
                         <label class="form-label fw-bold">Asset Name *</label>
                         <!-- PYTHON: value="{{ asset.asset_name }}" -->
-                        <input name="asset_name" class="form-control" required value="Production Server A">
+                        <input name="asset_name" class="form-control" required value="{{ asset.asset_name}}">
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Description</label>
-                        <textarea name="asset_description" class="form-control">Main SCADA host.</textarea>
+                        <te name="asset_description" class="form-control">{{ asset.asset_description }}</textarea>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">Category *</label>
                             <select name="category_id" class="form-select" required>
                                 <!-- PYTHON: options with selected matching asset.category_id -->
-                                <option value="1" selected>IT</option>
+                                <option value="IT" {% if asset.asset_category == 'IT' %}selected{% endif %}>IT</option>
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">Operational Status *</label>
                             <select name="operational_status_id" class="form-select" required>
-                                <option value="1" selected>Active</option>
+                                <option value="Active" {% if asset.asset_category == 'Active' %}selected{% endif %}>Active</option>
                             </select>
                         </div>
                     </div>
@@ -63,7 +124,8 @@
                             <label class="form-label fw-bold">CIA Triad Impact Rating</label>
                             <div class="d-flex gap-2">
                                 <select name="confidentiality_impact" class="form-select form-select-sm">
-                                    <option>Low</option><option selected>High</option>
+                                    <option>Low</option>
+                                    <option selected>High</option>
                                 </select>
                                 <select name="integrity_impact" class="form-select form-select-sm">
                                     <option selected>Medium</option>
@@ -77,11 +139,11 @@
                     <div class="row">
                         <div class="col-md-6 mb-4">
                             <label class="form-label fw-bold">Owner *</label>
-                            <input name="asset_owner" class="form-control" required value="Jane Smith">
+                            <input name="asset_owner" class="form-control" required value="{{ asset.asset_owner}}">
                         </div>
                         <div class="col-md-6 mb-4">
                             <label class="form-label fw-bold">Location</label>
-                            <input name="asset_location" class="form-control" value="Plant Floor 1">
+                            <input name="asset_location" class="form-control" value="{{ asset.location }}">
                         </div>
                     </div>
                     <div class="text-end">

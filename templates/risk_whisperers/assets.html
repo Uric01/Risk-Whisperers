@@ -11,13 +11,13 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'page' 'dashboard' %}"><i class="bi bi-shield-check me-2 text-info"></i>RiskSys</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'page' 'dashboard' %}">Dashboard</a></li>
-                    {% if user.is_authenticated %}
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'page' 'dashboard' %}"><i class="bi bi-shield-check me-2 text-info"></i>RiskSys</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'dashboard' %}">Dashboard</a></li>
+                {% if user.is_authenticated %}
                         {% if is_admin %}
                             <li class="nav-item"><a class="nav-link active" href="{% url 'page' 'assets' %}">Assets</a></li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'page' 'risks' %}">Risks</a></li>
@@ -43,10 +43,11 @@
                             </li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
                         {% elif is_auditor %}
-                                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'assets' %}">Assets</a></li>
+                                <li class="nav-item"><a class="nav-link active" href="{% url 'page' 'assets' %}">Assets</a></li>
                                 <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
                                 <li class="nav-item"><a class="nav-link" href="{% url 'page' 'audit_logs' %}">Audit Logs</a></li>
                         {% elif is_viewer %}
+                                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'risks' %}">Risks</a></li>
                                 <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
                         {% elif is_owner %}
                             <li class="nav-item"><a class="nav-link active" href="{% url 'page' 'assets' %}">Assets</a></li>
@@ -54,7 +55,7 @@
                                 <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Mitigations</a>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="{% url 'page' 'edit_mitigation' %}"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'page' 'add_mitigation' %}"><i class="bi bi-plus-circle me-2"></i>Add</a></li>
+                                    
                                 </ul>
                             </li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
@@ -65,14 +66,15 @@
                 {% else %}
 
                 {% endif %}
-                </ul>
-                <div class="d-flex align-items-center">
-                    <span class="text-light me-3"><i class="bi bi-person-circle me-1"></i>{{ user.username }}</span>
-                    <a href="{% url 'page' 'login' %}" class="btn btn-outline-light btn-sm">Logout</a>
-                </div>
+                
+            </ul>
+            <div class="d-flex align-items-center">
+                <span class="text-light me-3"><i class="bi bi-person-circle me-1"></i>{{ user.username }} (Admin)</span>
+                <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Logout</a>
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
 <div class="container mt-4">
 
 <div class="page-header d-flex justify-content-between align-items-center">
@@ -105,28 +107,30 @@
                 {% endif %}
 </div>
 
-<form class="card card-body mb-4" method="get">
+<form class="card card-body mb-4" method="get" action="{% url 'assets_filter' %}">
     <div class="row g-3">
         <div class="col-md-5">
-            <input name="q" class="form-control" placeholder="Search Asset" value="">
+            <input name="q" class="form-control" placeholder="Search Asset" value="{{ request.GET.q }}">
         </div>
         <div class="col-md-3">
-            <select name="category_id" class="form-select">
-                <option value="">All Categories</option>
-                <option>IT</option>
-                <option>OT</option>
-                <option>Infrastructure</option>
+            <select name="category" class="form-select">
+                 <option value="">All Categories</option>
+                <option value="IT"  {% if request.GET.category == "IT" %}selected{% endif %}>IT</option>
+                <option value="OT"  {% if request.GET.category == "OT" %}selected{% endif %}>OT</option>
+                <option value="INFRASTRUCTURE" {% if request.GET.category == "INFRASTRUCTURE" %}selected{% endif %}>Infrastructure</option>
             </select>
         </div>
         <div class="col-md-3">
-            <select name="status_id" class="form-select">
+            <select name="status" class="form-select">
                 <option value="">All Statuses</option>
-                <option>Active</option>
-                <option>Maintenance</option>
-                <option>Retired</option>
+                <option value="ACTIVE" {% if request.GET.status == "ACTIVE" %}selected{% endif %}>Active</option>
+                <option value="MAINTENANCE" {% if request.GET.status == "MAINTENANCE" %}selected{% endif %}>Maintenance</option>
+                <option value="RETIRED" {% if request.GET.status == "RETIRED" %}selected{% endif %}>Retired</option>
             </select>
         </div>
-        <div class="col-md-1"><button class="btn btn-secondary w-100">Go</button></div>
+        <div class="col-md-1">
+            <button class="btn btn-secondary w-100">Go</button>
+        </div>
     </div>
 </form>
 
@@ -158,41 +162,38 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>Production Server A</td>
-                    <td>IT</td>
-                    <td>Jane Smith</td>
-                    <td>Plant Floor 1</td>
-                    <td>Active</td>
+                {% for asset in assets %}
+                    <tr>
+                    <td>{{ asset.asset }}</td>
+                    <td>{{ asset.asset_name }}</td>
+                    <td>{{ asset.asset_category }}</td>
+                    <td>{{ asset.asset_owner }}</td>
+                    <td>{{ asset.location }}</td>
+                    <td>{{ asset.operational_status }}</td>
 
                     {% if user.is_authenticated %}
                         {% if is_admin %}
-                             <td class="text-end text-nowrap">
-                                <a class="btn btn-sm btn-outline-secondary" href="{% url 'page' 'view_asset' %}?id={{ asset.id }}">View</a>
-                                <a class="btn btn-sm btn-outline-primary" href="{% url 'page' 'edit_asset' %}?id={{ asset.id }}">Edit</a>
+                            <td class="text-end text-nowrap">
+                                <a class="btn btn-sm btn-outline-secondary" href="{% url 'view_asset' asset.asset %}">View</a>
+                                <a class="btn btn-sm btn-outline-primary" href="{% url 'edit_asset' asset.asset %}">Edit</a>
                                 <a class="btn btn-sm btn-outline-danger" href="{% url 'page' 'add_risk' %}?asset_id={{ asset.id }}">Add Risk</a>
                             </td>
                         {% elif is_risk_manager %}
-                             <td class="text-end text-nowrap">
-                                <a class="btn btn-sm btn-outline-secondary" href="{% url 'page' 'view_asset' %}?id={{ asset.id }}">View</a>
-                                <a class="btn btn-sm btn-outline-primary" href="{% url 'page' 'edit_asset' %}?id={{ asset.id }}">Edit</a>
+                            <td class="text-end text-nowrap">
+                                <a class="btn btn-sm btn-outline-secondary" href="{% url 'view_asset' asset.asset %}">View</a>
+                                <a class="btn btn-sm btn-outline-primary" href="{% url 'edit_asset' asset.asset %}">Edit</a>
                                 <a class="btn btn-sm btn-outline-danger" href="{% url 'page' 'add_risk' %}?asset_id={{ asset.id }}">Add Risk</a>
                             </td>
-                        {% elif is_auditor %}
-                                
-                        {% elif is_viewer %}
-                               
-                        {% elif is_owner %}
-                           
-                        {% else %}
-
-                            
                         {% endif %}
-                {% else %}
-
-                {% endif %}
+                    {% endif %}
+                    </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7">
+                        No assets found.
+                    </td>
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>

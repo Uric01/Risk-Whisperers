@@ -8,8 +8,70 @@
     <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
-<nav class="navbar navbar-dark bg-dark mb-4">
-    <div class="container-fluid"><a class="navbar-brand" href="dashboard.html">RiskSys</a></div>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'page' 'dashboard' %}"><i class="bi bi-shield-check me-2 text-info"></i>RiskSys</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'dashboard' %}">Dashboard</a></li>
+                {% if user.is_authenticated %}
+                        {% if is_admin %}
+                            <li class="nav-item"><a class="nav-link" href="{% url 'page' 'assets' %}">Assets</a></li>
+                            <li class="nav-item"><a class="nav-link active" href="{% url 'page' 'risks' %}">Risks</a></li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Mitigations</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{% url 'page' 'edit_mitigation' %}"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'page' 'add_mitigation' %}"><i class="bi bi-plus-circle me-2"></i>Add</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'page' 'audit_logs' %}">Audit Logs</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'page' 'user_management' %}">User Management</a></li>
+                        {% elif is_risk_manager %}
+                                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'assets' %}">Assets</a></li>
+                                <li class="nav-item"><a class="nav-link active" href="{% url 'page' 'risks' %}">Risks</a></li>
+                                <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Mitigations</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{% url 'page' 'edit_mitigation' %}"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'page' 'add_mitigation' %}"><i class="bi bi-plus-circle me-2"></i>Add</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
+                        {% elif is_auditor %}
+                                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'assets' %}">Assets</a></li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'audit_logs' %}">Audit Logs</a></li>
+                        {% elif is_viewer %}
+                                <li class="nav-item"><a class="nav-link active" href="{% url 'page' 'risks' %}">Risks</a></li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
+                        {% elif is_owner %}
+                            <li class="nav-item"><a class="nav-link" href="{% url 'page' 'assets' %}">Assets</a></li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Mitigations</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{% url 'page' 'edit_mitigation' %}"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
+                                    
+                                </ul>
+                            </li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
+                        {% else %}
+
+                            
+                        {% endif %}
+                {% else %}
+
+                {% endif %}
+                
+            </ul>
+            <div class="d-flex align-items-center">
+                <span class="text-light me-3"><i class="bi bi-person-circle me-1"></i>{{ user.username }} (Admin)</span>
+                <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Logout</a>
+            </div>
+        </div>
+    </div>
 </nav>
 <div class="container">
 
@@ -18,13 +80,15 @@
         <div class="card shadow-sm border-danger border-top border-4">
             <div class="card-header bg-white"><h4 class="text-danger">Add Risk</h4></div>
             <div class="card-body">
-                <form method="post" action="risks.html">
+                <form method="post" action="{% url 'add_risk' %}">
+                    {% csrf_token %} 
                     <div class="mb-3">
                         <label class="form-label fw-bold">Asset *</label>
-                        <select name="asset_id" class="form-select" required>
+                        <select name="asset" class="form-select" required>
                             <option value="">Select Asset...</option>
-                            <!-- PYTHON: {% for a in assets %} selected if request.args.asset_id == a.id {% endfor %} -->
-                            <option value="1" selected>Production Server A</option>
+                            {% for asset in assets %}
+                                <option value="{{ asset.asset }}">{{ asset.asset_name }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                     <div class="mb-3">
@@ -37,22 +101,25 @@
                          POST: validate risk_category_id
                          -->
                         <label class="form-label fw-bold">Risk Category *</label>
-                        <select name="risk_category_id" class="form-select" required>
+                        <select name="risk_category" class="form-select" required>
                             <option value="">Select Category...</option>
-                            <option value="1">Cybersecurity</option>
-                            <option value="2">Operational</option>
-                            <option value="3">Safety</option>
-                            <option value="4">Compliance</option>
-                            <option value="5">Physical Security</option>
-                            <option value="6">Environmental</option>
+                            <option value="CYBERSECURITY">Cybersecurity</option>
+                            <option value="OPERATIONAL">Operational</option>
+                            <option value="SAFETY">Safety</option>
+                            <option value="COMPLIANCE">Compliance</option>
+                            <option value="PHYSICAL_SECURITY">Physical Security</option>
+                            <option value="ENVIRONMENTAL">Environmental</option>
                         </select>
                     </div>
                     <div class="row bg-light rounded p-3 mb-4 mx-0 border">
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Likelihood *</label>
                             <select name="likelihood" id="likelihood" class="form-select" required>
-                                <option value="1">1</option><option value="2">2</option>
-                                <option value="3" selected>3</option><option value="4">4</option><option value="5">5</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3" selected>3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
                             </select>
                         </div>
                         <div class="col-md-3">
@@ -64,11 +131,11 @@
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Risk Rating</label>
                             <!-- PYTHON: Server recalculates on save; JS updates display only -->
-                            <input type="text" id="risk_rating_display" class="form-control fw-bold text-danger" readonly value="High (15)">
+                            <input name = "risk_rating"type="text" id="risk_rating_display" class="form-control fw-bold text-danger" readonly value="High (15)">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Status</label>
-                            <select name="risk_status_id" class="form-select">
+                            <select name="risk_status" class="form-select">
                                 <!-- PYTHON: loop risk_statuses, default Open -->
                                 <option value="1">Open</option>
                             </select>
@@ -77,7 +144,7 @@
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <label class="form-label fw-bold">Treatment *</label>
-                            <select name="treatment_option_id" class="form-select" required>
+                            <select name="risk_treatment_option" class="form-select" required>
                                 <option value="1">Mitigate</option>
                             </select>
                         </div>
@@ -94,14 +161,13 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Annex Controls</label>
-                        <select name="control_ids" class="form-select" multiple>
-                            <!-- PYTHON: name="control_ids" multiple — request.form.getlist("control_ids") -->
+                        <select name="control" class="form-select" multiple>
                             <option value="1">A.5.1 Policies for information security</option>
                         </select>
                     </div>
                     <div class="text-end">
                         <a href="risks.html" class="btn btn-light border">Cancel</a>
-                        <button class="btn btn-danger">Save Risk</button>
+                        <button type="submit" class="btn btn-danger">Save Risk</button>
                     </div>
                 </form>
             </div>

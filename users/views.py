@@ -23,7 +23,7 @@ def login_view(request):
         else:
             messages.error(request, "Invalid username or password.")
             return redirect('login')
-    return render(request, 'risk_whisperers/login.html')
+    return render(request, 'risk_whisperers/login.html',{"message": messages})
 
 def logout_view(request):
     logout(request)

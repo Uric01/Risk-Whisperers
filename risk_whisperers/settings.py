@@ -7,14 +7,15 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
-    'users',
+    "webapp",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'webapp',
+    'users',
+    
 ]
 
 MIDDLEWARE = [
@@ -52,7 +53,7 @@ DATABASES = {
      "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "risksys_db",
-        "USER": "django_user",
+        "USER": "postgres",
         "PASSWORD": "@Risk@2026",
         "HOST": "localhost",
         "PORT": "5432",

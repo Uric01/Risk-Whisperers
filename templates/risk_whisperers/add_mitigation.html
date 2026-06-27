@@ -11,20 +11,21 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href={% url 'page' 'dashboard' %}><i class="bi bi-shield-check me-2 text-info"></i>RiskSys</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'page' 'dashboard' %}">Dashboard</a></li>
-                    {% if user.is_authenticated %}
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'page' 'dashboard' %}"><i class="bi bi-shield-check me-2 text-info"></i>RiskSys</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'dashboard' %}">Dashboard</a></li>
+                {% if user.is_authenticated %}
                         {% if is_admin %}
                             <li class="nav-item"><a class="nav-link" href="{% url 'page' 'assets' %}">Assets</a></li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'page' 'risks' %}">Risks</a></li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle active" href="#" data-bs-toggle="dropdown">Mitigations</a>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href={% url 'page' 'edit_mitigation' %}><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'page' 'edit_mitigation' %}"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'page' 'add_mitigation' %}"><i class="bi bi-plus-circle me-2"></i>Add</a></li>
                                 </ul>
                             </li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
@@ -36,7 +37,8 @@
                                 <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle active" href="#" data-bs-toggle="dropdown">Mitigations</a>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href={% url 'page' 'edit_mitigation' %}><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'page' 'edit_mitigation' %}"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'page' 'add_mitigation' %}"><i class="bi bi-plus-circle me-2"></i>Add</a></li>
                                 </ul>
                             </li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
@@ -45,6 +47,7 @@
                                 <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
                                 <li class="nav-item"><a class="nav-link" href="{% url 'page' 'audit_logs' %}">Audit Logs</a></li>
                         {% elif is_viewer %}
+                                <li class="nav-item"><a class="nav-link" href="{% url 'page' 'risks' %}">Risks</a></li>
                                 <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
                         {% elif is_owner %}
                             <li class="nav-item"><a class="nav-link" href="{% url 'page' 'assets' %}">Assets</a></li>
@@ -52,7 +55,7 @@
                                 <a class="nav-link dropdown-toggle active" href="#" data-bs-toggle="dropdown">Mitigations</a>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="{% url 'page' 'edit_mitigation' %}"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'page' 'add_mitigation' %}"><i class="bi bi-plus-circle me-2"></i>Add</a></li>
+                                    
                                 </ul>
                             </li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
@@ -63,15 +66,15 @@
                 {% else %}
 
                 {% endif %}
-                </ul>
-                <div class="d-flex align-items-center">
-                    <!-- PYTHON: {{ session.full_name }} -->
-                    <span class="text-light me-3"><i class="bi bi-person-circle me-1"></i> {{ user.username }}</span>
-                    <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Logout</a>
-                </div>
+                
+            </ul>
+            <div class="d-flex align-items-center">
+                <span class="text-light me-3"><i class="bi bi-person-circle me-1"></i>{{ user.username }} (Admin)</span>
+                <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Logout</a>
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
 
 {% if user.is_authenticated %}
         {% if is_admin %}
@@ -81,11 +84,15 @@
                         <div class="card shadow-sm border-success border-top border-4">
                             <div class="card-header bg-white"><h4 class="text-success">Add Mitigation Action</h4></div>
                             <div class="card-body">
-                                <form method="post" action="mitigations.html">
+                                <form method="post" action="{% url 'add_mitigation' %}">
+                                    {% csrf_token %}
                                     <div class="mb-3">
                                         <label class="form-label fw-bold">Risk *</label>
                                         <select name="risk_id" class="form-select" required>
-                                            <option value="101" selected>RSK-101: Unauthorized access to control network</option>
+                                            <option value="{" selected>Select risk...</option>
+                                            {% for risk in risks %}
+                                                <option value="{{ risk.risk_id }}">{{ risk.risk_description }}</option>
+                                            {% endfor %}
                                         </select>
                                     </div>
                                     <div class="mb-3">
@@ -96,7 +103,10 @@
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label fw-bold">Assigned To *</label>
                                             <select name="assigned_to" class="form-select" required>
-                                                <option value="2">John Doe</option>
+                                                <option value="" selected>Select asset owner..</option>
+                                                {% for owner in owners %}
+                                                    <option value="{{ owner }}">{{ owner }}</option>
+                                                {% endfor %}
                                             </select>
                                         </div>
                                         <div class="col-md-6 mb-3">
@@ -106,11 +116,11 @@
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label fw-bold">Progress Status</label>
-                                        <select name="mitigation_status_id" class="form-select">
+                                        <select name="mitigation_status" class="form-select">
 
-                                            <option value="1">Not Started</option>
-                                            <option value="2">In Progress</option>
-                                            <option value="3">Completed</option>
+                                            <option value="Not Started">Not Started</option>
+                                            <option value="In Progress">In Progress</option>
+                                            <option value="Completed">Completed</option>
                                         </select>
                                     </div>
                                     <div class="mb-3">
@@ -138,7 +148,8 @@
                         <div class="card shadow-sm border-success border-top border-4">
                             <div class="card-header bg-white"><h4 class="text-success">Add Mitigation Action</h4></div>
                             <div class="card-body">
-                                <form method="post" action="mitigations.html">
+                                <form method="post" action="{% url 'add_mitigation' %}">
+                                    {% csrf_token %}
                                     <div class="mb-3">
                                         <label class="form-label fw-bold">Risk *</label>
                                         <select name="risk_id" class="form-select" required>
@@ -164,9 +175,9 @@
                                     <div class="mb-3">
                                         <label class="form-label fw-bold">Progress Status</label>
                                         <select name="mitigation_status_id" class="form-select">
-                                            <option value="1">Not Started</option>
-                                            <option value="2">In Progress</option>
-                                            <option value="3">Completed</option>
+                                            <option value="Not Started">Not Started</option>
+                                            <option value="In Progress">In Progress</option>
+                                            <option value="Completed">Completed</option>
                                         </select>
                                     </div>
                                     <div class="mb-3">
@@ -178,8 +189,8 @@
                                         <input name="effectiveness_review_date" type="date" class="form-control">
                                     </div>
                                     <div class="text-end">
-                                        <a href="mitigations.html" class="btn btn-light border">Cancel</a>
-                                        <button class="btn btn-success">Save Mitigation</button>
+                                        <a href="{% url page 'add_mitigation' %}" class="btn btn-light border">Cancel</a>
+                                        <button type="submit" class="btn btn-success">Save Mitigation</button>
                                     </div>
                                 </form>
                             </div>
