@@ -30,7 +30,7 @@
                             </li>
                             <li class="nav-item"><a class="nav-link active" href="{% url 'page' 'reports' %}">Reports</a></li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'page' 'audit_logs' %}">Audit Logs</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{% url 'page' 'user_management' %}">User Management</a></li>
+                            
                         {% elif is_risk_manager %}
                                 <li class="nav-item"><a class="nav-link" href="{% url 'page' 'assets' %}">Assets</a></li>
                                 <li class="nav-item"><a class="nav-link" href="{% url 'page' 'risks' %}">Risks</a></li>
@@ -82,12 +82,11 @@
     <p class="text-muted mb-0">Systemic risk report with filters and export.</p>
 </div>
 
-<form class="card card-body mb-4" method="get">
+<form class="card card-body mb-4" method="get" action="{% url 'report_filter' %}">
     <div class="row g-3 align-items-end">
         <div class="col-md-3">
             <label class="form-label fw-bold">Date From</label>
             <input type="date" name="date_from" class="form-control">
-            <!-- PYTHON: value="{{ filters.date_from }}" -->
         </div>
         <div class="col-md-3">
             <label class="form-label fw-bold">Date To</label>
@@ -95,17 +94,21 @@
         </div>
         <div class="col-md-3">
             <label class="form-label fw-bold">Asset Category</label>
-            <select name="category_id" class="form-select">
+            <select name="category" class="form-select">
                 <option value="">All Categories</option>
-                <!-- PYTHON: loop asset_categories -->
-                <option value="1">IT</option>
+                {% for asset_cat in asset_categories%}
+                    <option value="{asset_cat}">{{asset_cat}}</option>
+                {% endfor %}
+
             </select>
         </div>
         <div class="col-md-3">
             <label class="form-label fw-bold">Risk Status</label>
-            <select name="risk_status_id" class="form-select">
+            <select name="risk_status" class="form-select">
                 <option value="">All Statuses</option>
-                <option value="1">Open</option>
+                {% for all_risks_status in all_risks_statuses%}
+                    <option value="{all_risks_status}">{{all_risks_status}}</option>
+                {% endfor %}
             </select>
         </div>
 
@@ -140,22 +143,22 @@
 <div class="row g-3 mb-4">
     <div class="col-md-3">
         <div class="p-3 bg-white border rounded shadow-sm text-center">
-            <h6>Total Assets</h6><h3>12</h3>
+            <h6>Total Assets</h6><h3>{{total_assets}}</h3>
         </div>
     </div>
     <div class="col-md-3">
         <div class="p-3 bg-white border rounded shadow-sm text-center">
-            <h6>Total Risks</h6><h3>8</h3>
+            <h6>Total Risks</h6><h3>{{total_risks}}</h3>
         </div>
     </div>
     <div class="col-md-3">
         <div class="p-3 bg-white border rounded shadow-sm text-center">
-            <h6>Open Risks</h6><h3>5</h3>
+            <h6>Open Risks</h6><h3>{{total_open_risks}}</h3>
         </div>
     </div>
     <div class="col-md-3">
         <div class="p-3 bg-white border rounded shadow-sm text-center">
-            <h6>Overdue Mitigations</h6><h3>2</h3>
+            <h6>Overdue Mitigations</h6><h3>{{overdue_mitigations_count}}</h3>
             <!-- PYTHON: COUNT mitigations WHERE target_date < today AND status != Completed -->
         </div>
     </div>
@@ -171,16 +174,16 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- PYTHON: {% for row in report_rows %} -->
+                {% for item in report_data %}
                 <tr>
-                    <td>IT</td>
-                    <td>Production Server A</td>
-                    <td>RSK-101</td>
-                    <td>15</td>
-                    <td>Open</td>
-                    <td>2026-05-15</td>
+                    <td>{{ item.category }}</td>
+                    <td>{{ item.asset }}</td>
+                    <td>RSK-{{ item.risk_id }}</td>
+                    <td>{{ item.rating }}</td>
+                    <td>{{ item.status }}</td>
+                    <td>{{ item.target_date }}</td>
                 </tr>
-                <!-- PYTHON: {% endfor %} -->
+                {% endfor %}
             </tbody>
         </table>
     </div>

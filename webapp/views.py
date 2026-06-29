@@ -2,6 +2,7 @@ from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from users.models import Asset, Risk, Mitigation
 from django.contrib.auth.models import User
+from datetime import date
 
 
 
@@ -31,13 +32,41 @@ ALLOWED_PAGES = {
 all_assets = Asset.objects.all()
 all_risks = Risk.objects.all()
 all_mitigations = Mitigation.objects.all()
+all_asset_categories = Asset.objects.values_list("asset_category", flat=True)
+all_risks_statuses = Risk.objects.values_list("risk_status", flat=True)
 
+target_dates = all_mitigations.values_list("target_date", flat=True)
+current_date = date.today()
+count = 0
+for target_date in target_dates:
+    if current_date > target_date:
+        count += 1
+
+report_data = [
+    {
+        "category": m.risk.asset.asset_category,
+        "asset": m.risk.asset.asset_name,
+        "risk_id": m.risk.risk_id,
+        "rating": m.risk.risk_rating,
+        "status": m.risk.risk_status,
+        "target_date": m.target_date,
+    }
+    for m in Mitigation.objects.select_related("risk", "risk__asset")
+]
 
 def home(request):
     return render(request, ALLOWED_PAGES['login'])
 
 def page(request, page_name):
+    asset_owners = User.objects.filter(groups__name="Asset_Owner").values_list('username', flat=True)
+    asset_owner_list = list(asset_owners)
     template = ALLOWED_PAGES.get(page_name)
+    total_assets = all_assets.count()
+    total_risks = all_risks.count()
+    total_open_risks = all_risks.filter(risk_status="OPEN").count()
+    total_completed_mitigations = all_mitigations.filter(progress_status="Completed").count()
+    overdue_mitigations_count =  count
+    
     if not template:
         raise Http404('Page not found')
     user = request.user
@@ -49,7 +78,16 @@ def page(request, page_name):
         "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
         "risks": all_risks,
         "assets": all_assets,
-        
+        "mitigations":all_mitigations,
+        "owners": asset_owner_list,
+        "asset_categories":all_asset_categories,
+        "all_risks_statuses":all_risks_statuses,
+        "total_assets":total_assets,
+        "total_risks": total_risks,
+        "total_open_risks": total_open_risks,
+        "overdue_mitigations_count": overdue_mitigations_count,
+        "report_data":report_data,
+        "total_completed_mitigations":total_completed_mitigations,
     }
     return render(request, template, context)
 
@@ -208,7 +246,10 @@ def edit_asset(request, asset_id):
     context = {
         "asset": selected_asset,
         "is_admin": user.groups.filter(name="Admin").exists() if user.is_authenticated else False,
-        # ... include your other role checks ...
+        "is_risk_manager": user.groups.filter(name="Risk_Manager").exists() if user.is_authenticated else False,
+        "is_auditor": user.groups.filter(name="Auditor").exists() if user.is_authenticated else False,
+        "is_viewer": user.groups.filter(name="viewer").exists() if user.is_authenticated else False,
+        "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
     }
     
     return render(request, ALLOWED_PAGES['edit_asset'], context)
@@ -248,41 +289,75 @@ def add_risk(request):
 
 
 
-def edit_risk(request, asset_id):
+def edit_risk(request, risk_id):
     # Fetch the existing asset
-    selected_asset = get_object_or_404(Asset, asset=asset_id)
+    selected_risk = get_object_or_404(Risk, risk_id=risk_id)
 
     if request.method == "POST":
         # Update the object with new data from the form
-        selected_asset.asset_name = request.POST.get("asset_name")
-        selected_asset.asset_description = request.POST.get("asset_description")
-        selected_asset.asset_owner = request.POST.get("asset_owner")
-        selected_asset.location = request.POST.get("asset_location")
-        
-        # Make sure your HTML name attributes match what you expect here!
-        selected_asset.asset_category = request.POST.get("asset_category")
-        selected_asset.operational_status = request.POST.get("operational_status")
-        selected_asset.classification = request.POST.get("classification")
-        selected_asset.cia_confidentiality = request.POST.get("confidentiality_impact")
-        selected_asset.cia_integrity = request.POST.get("integrity_impact")
-        selected_asset.cia_availability = request.POST.get("availability_impact")
+        selected_risk.risk_description = request.POST.get("risk_description")
+        selected_risk.likelihood = request.POST.get("likelihood")
+        selected_risk.impact = request.POST.get("impact")
+        selected_risk.risk_rating = request.POST.get("risk_rating")
+        selected_risk.risk_status = request.POST.get("risk_status")
+        selected_risk.risk_treatment = request.POST.get("risk_treatment")
+        selected_risk.review_date = request.POST.get("review_date")
+        selected_risk.annex_control = request.POST.get("annex_control")
         
         # Save the changes to the database
-        selected_asset.save()
+        selected_risk.save()
         
-        # Redirect back to the view page to see the updates
-        return redirect('view_asset', asset_id=selected_asset.asset)
+        # Redirect back to the risk page to see the updates
+        return redirect('view_risk', risk_id=selected_risk.risk_id)
 
-    # For a GET request, pass the asset and permissions to the template
     user = request.user
     context = {
-        "asset": selected_asset,
+        "selected_risk": selected_risk,
         "is_admin": user.groups.filter(name="Admin").exists() if user.is_authenticated else False,
-        # ... include your other role checks ...
+        "is_risk_manager": user.groups.filter(name="Risk_Manager").exists() if user.is_authenticated else False,
+        "is_auditor": user.groups.filter(name="Auditor").exists() if user.is_authenticated else False,
+        "is_viewer": user.groups.filter(name="viewer").exists() if user.is_authenticated else False,
+        "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
     }
     
-    return render(request, ALLOWED_PAGES['edit_asset'], context)
+    return render(request, ALLOWED_PAGES['edit_risk'], context)
 
+
+def view_risk(request, risk_id):
+    selected_risk = get_object_or_404(Risk, risk_id=risk_id)
+    
+    user = request.user
+    context = {
+        "selected_risk": selected_risk,
+        "is_admin": user.groups.filter(name="Admin").exists() if user.is_authenticated else False,
+        "is_risk_manager": user.groups.filter(name="Risk_Manager").exists() if user.is_authenticated else False,
+        "is_auditor": user.groups.filter(name="Auditor").exists() if user.is_authenticated else False,
+        "is_viewer": user.groups.filter(name="viewer").exists() if user.is_authenticated else False,
+        "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
+        "risks": all_risks,
+        "assets": all_assets,
+        "mitigations":all_mitigations,
+    }
+    
+    return render(request, ALLOWED_PAGES['view_risk'], context)
+
+def view_risk_edit(request, risk_id):
+    selected_risk_to_edit = get_object_or_404(Risk, risk_id=risk_id)
+    
+    user = request.user
+    context = {
+        "selected_risk_to_edit": selected_risk_to_edit,
+        "is_admin": user.groups.filter(name="Admin").exists() if user.is_authenticated else False,
+        "is_risk_manager": user.groups.filter(name="Risk_Manager").exists() if user.is_authenticated else False,
+        "is_auditor": user.groups.filter(name="Auditor").exists() if user.is_authenticated else False,
+        "is_viewer": user.groups.filter(name="viewer").exists() if user.is_authenticated else False,
+        "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
+        "risks": all_risks,
+        "assets": all_assets,
+        "mitigations":all_mitigations,
+    }
+    
+    return render(request, ALLOWED_PAGES['edit_risk'], context)
 
 def add_mitigation(request):
     asset_owners = User.objects.filter(groups__name="Asset_Owner").values_list('username', flat=True)
@@ -352,56 +427,100 @@ def view_mitigations(request):
     }
     return render(request, ALLOWED_PAGES['mitigations'], context)
 
-def edit_mitigation(request, mitigation_id):
+def edit_risk_mitigation(request):
     asset_owners = User.objects.filter(groups__name="Asset_Owner").values_list('username', flat=True)
     asset_owner_list = list(asset_owners)
-    
-    # Fetch the existing mitigation action
-    selected_mitigation = get_object_or_404(Mitigation, pk=mitigation_id)
-
     if request.method == "POST":
-        # Update the object with new data from the form
-        # Matches <select name="risk_id">
-        selected_mitigation.risk_id = request.POST.get("risk_id") 
+        risk_id = request.POST.get("risk_id")
+        #Fetch the selected risk to ensure it exists
+        selected_risk = get_object_or_404(Risk, risk_id=risk_id)
         
-        # Matches <textarea name="action_description">
-        selected_mitigation.action_description = request.POST.get("action_description")
+        # Fetch the associated mitigation row using the risk foreign key
+        # .first() safely grabs the mitigation, or returns None if none exists yet
+        mitigation = Mitigation.objects.filter(risk=selected_risk).first()
         
-        # Matches <select name="assigned_to">. Note: If this is a foreign key, 
-        # Django usually expects the attribute to be assigned_to_id
-        selected_mitigation.assigned_to_id = request.POST.get("assigned_to")
-        
-        # Matches <input name="target_date">
-        selected_mitigation.target_date = request.POST.get("target_date")
-        
-        # Matches <select name="mitigation_status_id">
-        selected_mitigation.status_id = request.POST.get("mitigation_status_id")
-        
-        # Matches <textarea name="comments">
-        selected_mitigation.comments = request.POST.get("comments")
-        
-        # Matches <input name="effectiveness_review_date">
-        selected_mitigation.effectiveness_review_date = request.POST.get("effectiveness_review_date")
-        
-        # Save the changes to the database
-        selected_mitigation.save()
-        
-        # Redirect back to the mitigations view or wherever appropriate
-        return redirect('page', page_name='mitigations') 
+        # If the user is submitting updates, ensure a mitigation actually exists to update
+        if mitigation:
+            mitigation.action_description = request.POST.get("action_description")
+            mitigation.target_date = request.POST.get("target_date")
+            mitigation.progress_status = request.POST.get("mitigation_status")
+            mitigation.comments = request.POST.get("comments")
+            mitigation.effectiveness_review_date = request.POST.get("effectiveness_review_date")
+            
+            # Handle the assigned_to foreign key
+            assigned_to_username = request.POST.get("assigned_to")
+            try:
+                mitigation.assigned_to = User.objects.get(username=assigned_to_username)
+            except User.DoesNotExist:
+                pass # Handle user not found appropriately
+                
+            mitigation.save()
+            return redirect('page', page_name='mitigations')
 
-    # For a GET request, pass the mitigation and permissions to the template
+    # 3. For a GET request, pass the mitigation object to the template context
     user = request.user
-    is_auth = user.is_authenticated
-    
-    # Passing the exact booleans expected by your HTML template's logic
     context = {
-        "mitigation": selected_mitigation,
-        "is_admin": user.groups.filter(name="Admin").exists() if is_auth else False,
-        "is_risk_manager": user.groups.filter(name="Risk Manager").exists() if is_auth else False,
-        "is_auditor": user.groups.filter(name="Auditor").exists() if is_auth else False,
-        "is_viewer": user.groups.filter(name="Viewer").exists() if is_auth else False,
-        "is_owner": user.groups.filter(name="Owner").exists() if is_auth else False,
+        "is_admin": user.groups.filter(name="Admin").exists() if user.is_authenticated else False,
+        "is_risk_manager": user.groups.filter(name="Risk_Manager").exists() if user.is_authenticated else False,
+        "is_auditor": user.groups.filter(name="Auditor").exists() if user.is_authenticated else False,
+        "is_viewer": user.groups.filter(name="viewer").exists() if user.is_authenticated else False,
+        "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
+        "assets": all_assets,
         "owners": asset_owner_list,
     }
     
+    # Ensure this points to the correct HTML template for editing mitigations
     return render(request, ALLOWED_PAGES['edit_mitigation'], context)
+
+
+def report_filter(request):
+    all_assets = Asset.objects.all()
+    q = request.GET.get("q")
+    category = request.GET.get("category")
+    status = request.GET.get("risk_status")
+
+    if q:
+        all_assets = all_assets.filter(asset_name__icontains=q)
+        total_assets = all_assets.count()
+
+    if category:
+        all_assets = all_assets.filter(asset_category=category)
+        total_assets = all_assets.count()
+
+    if status:
+        all_assets = all_assets.filter(operational_status=status)
+        total_assets = all_assets.count()
+    
+    if category and status:
+        all_assets = all_assets.filter(asset_category=category).filter(operational_status=status)
+        total_assets = all_assets.count()
+        
+    if q and category and status:
+        all_assets = all_assets.filter(asset_category=category).filter(operational_status=status).filter(asset_name__icontains=q)
+        total_assets = all_assets.count()
+        
+    if q and category:
+        all_assets = all_assets.filter(asset_category=category).filter(asset_name__icontains=q)
+        total_assets = all_assets.count()
+
+    if q and status:
+        all_assets = all_assets.filter(operational_status=status).filter(asset_name__icontains=q)
+        total_assets = all_assets.count()
+
+    total_assets = all_assets.count()
+    
+    user = request.user
+    
+    context = {
+        "is_admin": user.groups.filter(name="Admin").exists() if user.is_authenticated else False,
+        "is_risk_manager": user.groups.filter(name="Risk_Manager").exists() if user.is_authenticated else False,
+        "is_auditor": user.groups.filter(name="Auditor").exists() if user.is_authenticated else False,
+        "is_viewer": user.groups.filter(name="viewer").exists() if user.is_authenticated else False,
+        "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
+        "assets": all_assets, # FIXED: Changed from "asset_filter"
+        "total_assets": total_assets
+    }
+    
+    print("TOTAL ASSETS:", all_assets.count())
+
+    return render(request, ALLOWED_PAGES['reports'], context)

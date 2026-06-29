@@ -32,7 +32,7 @@
                             </li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'page' 'audit_logs' %}">Audit Logs</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{% url 'page' 'user_management' %}">User Management</a></li>
+                            
                         {% elif is_risk_manager %}
                                 <li class="nav-item"><a class="nav-link active" href="{% url 'page' 'assets' %}">Assets</a></li>
                                 <li class="nav-item"><a class="nav-link" href="{% url 'page' 'risks' %}">Risks</a></li>
@@ -86,23 +86,23 @@
             <div class="card-body">
                 <form method="post" action="{% url 'edit_asset' asset.asset %}">
                     {% csrf_token %}
-                    <!-- PYTHON: hidden asset_id; csrf_token -->
+                   
                     <input type="hidden" name="asset_id" value="{{ asset.asset }}">
 
                     <div class="mb-3">
                         <label class="form-label fw-bold">Asset Name *</label>
-                        <!-- PYTHON: value="{{ asset.asset_name }}" -->
+                       
                         <input name="asset_name" class="form-control" required value="{{ asset.asset_name}}">
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Description</label>
-                        <te name="asset_description" class="form-control">{{ asset.asset_description }}</textarea>
+                        <textarea name="asset_description" class="form-control">{{ asset.asset_description }}</textarea>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">Category *</label>
                             <select name="category_id" class="form-select" required>
-                                <!-- PYTHON: options with selected matching asset.category_id -->
+                               
                                 <option value="IT" {% if asset.asset_category == 'IT' %}selected{% endif %}>IT</option>
                             </select>
                         </div>
@@ -117,21 +117,30 @@
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Classification</label>
                             <select name="classification_id" class="form-select">
-                                <option value="">Select...</option>
+                                <option value="" {%if asset.classification == "" %}select {% endif %}>Select...</option>
+                                <option value="PUBLIC" {%if asset.classification == PUBLIC %}select {% endif %}>PUBLIC</option>
+                                <option value="INTERNAL" {%if asset.classification == INTERNAL %}select {% endif %}>INTERNAL</option>
+                                <option value="CONFIDENTIAL" {%if asset.classification == CONFIDENTIAL %}select {% endif %}>CONFIDENTIAL</option>
+                                <option value="RESTRICTED" {%if asset.classification == RESTRICTED %}select {% endif %}>RESTRICTED</option>
                             </select>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">CIA Triad Impact Rating</label>
                             <div class="d-flex gap-2">
                                 <select name="confidentiality_impact" class="form-select form-select-sm">
-                                    <option>Low</option>
-                                    <option selected>High</option>
+                                    <option value="Low" {%if asset.cia_confidentiality == Low %}select {% endif %}>Low</option>
+                                    <option value="Medium" {%if asset.cia_confidentiality == Medium %}select {% endif %}>Medium</option>
+                                    <option value="High" {%if asset.cia_confidentiality == High %}select {% endif %}>High</option>
                                 </select>
                                 <select name="integrity_impact" class="form-select form-select-sm">
-                                    <option selected>Medium</option>
+                                    <option value="Low" {%if asset.cia_integrity == Low %}select {% endif %}>Low</option>
+                                    <option value="Medium" {%if asset.cia_integrity == Medium %}select {% endif %}>Medium</option>
+                                    <option value="High" {%if asset.cia_integrity == High %}select {% endif %}>High</option>
                                 </select>
                                 <select name="availability_impact" class="form-select form-select-sm">
-                                    <option selected>High</option>
+                                    <option value="Low" {%if asset.cia_availability == Low %}select {% endif %}>Low</option>
+                                    <option value="Medium" {%if asset.cia_availability == Medium %}select {% endif %}>Medium</option>
+                                    <option value="High" {%if asset.cia_availability == High %}select {% endif %}>High</option>
                                 </select>
                             </div>
                         </div>
@@ -147,7 +156,7 @@
                         </div>
                     </div>
                     <div class="text-end">
-                        <a href="view_asset.html" class="btn btn-light border">Cancel</a>
+                        <a href="{% url 'page' 'assets' %}" class="btn btn-light border">Cancel</a>
                         <button class="btn btn-primary">Update Asset</button>
                     </div>
                 </form>

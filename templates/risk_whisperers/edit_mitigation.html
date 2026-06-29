@@ -31,7 +31,7 @@
                             </li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'page' 'audit_logs' %}">Audit Logs</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{% url 'page' 'user_management' %}">User Management</a></li>
+                            
                         {% elif is_risk_manager %}
                                 <li class="nav-item"><a class="nav-link" href="{% url 'page' 'assets' %}">Assets</a></li>
                                 <li class="nav-item"><a class="nav-link" href="{% url 'page' 'risks' %}">Risks</a></li>
@@ -84,54 +84,69 @@
                     <div class="col-md-8">
                         <div class="card shadow-sm border-success border-top border-4">
                             <div class="card-header bg-white">
-                                <h4 class="text-success">Edit Mitigation Action</h4>
-                                <p class="text-muted mb-0 small">MIT-1</p>
-                            </div>
-                            <div class="card-body">
-                                <form method="post">
-                                    <input type="hidden" name="mitigation_id" value="1">
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">Risk *</label>
-                                        <select name="risk_id" class="form-select" required>
-                                            <option value="101" selected>RSK-101: Unauthorized access</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">Action Description *</label>
-                                        <textarea name="action_description" class="form-control" required>Install network segmentation</textarea>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label fw-bold">Assigned To *</label>
-                                            <select name="assigned_to" class="form-select" required>
-                                                <option value="2" selected>John Doe</option>
+                                    <h4 class="text-success">Edit Mitigation Action</h4>
+                                </div>
+                                <div class="card-body">
+                                    <form method="post" action="{% url 'edit_risk_mitigation' %}">
+                                        {% csrf_token %} 
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Risk *</label>
+                                            <select name="risk_id" class="form-select" required>
+                                                <option value="" selected>Select risk...</option>
+                                                {% for risk in risks %}
+                                                    <option value="{{ risk.risk_id }}">
+                                                        {{ risk.risk_id }} - {{ risk.risk_description }}
+                                                    </option>
+                                                {% endfor %}
                                             </select>
                                         </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label fw-bold">Target Date</label>
-                                            <input name="target_date" type="date" class="form-control" value="2026-05-15">
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Action Description *</label>
+                                            <textarea name="action_description" class="form-control" required></textarea>
                                         </div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">Progress Status</label>
-                                        <select name="mitigation_status_id" class="form-select">
-                                            <option value="2" selected>In Progress</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">Comments</label>
-                                        <textarea name="comments" class="form-control">Scheduled for Q2 maintenance window.</textarea>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">Effectiveness Review Date</label>
-                                        <input name="effectiveness_review_date" type="date" class="form-control" value="2026-07-01">
-                                    </div>
-                                    <div class="text-end">
-                                        <a href="mitigations.html" class="btn btn-light border">Cancel</a>
-                                        <button class="btn btn-success">Update Mitigation</button>
-                                    </div>
-                                </form>
-                            </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-bold">Assigned To *</label>
+                                                <select name="assigned_to" class="form-select" required>
+                                                   <option value="" selected>Select asset owner..</option>
+                                                        {% for owner in owners %}
+                                                            <option value="{{ owner }}">{{ owner }}</option>
+                                                        {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-bold">Target Date</label>
+                                                <input name="target_date" type="date" class="form-control" value="{{ mitigation.target_date|date:'Y-m-d' }}">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Progress Status</label>
+                                            <select name="mitigation_status" class="form-select">
+                                                <option value="Not Started">Not Started</option>
+                                                <option value="In Progress" >In Progress</option>
+                                                <option value="Completed" >Completed</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Comments</label>
+                                            <textarea name="comments" class="form-control">{{ mitigation.comments }}</textarea>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Effectiveness Review Date</label>
+                                            <input name="effectiveness_review_date" type="date" class="form-control" value="{{ mitigation.effectiveness_review_date|date:'Y-m-d' }}">
+                                        </div>
+                                        
+                                        <div class="text-end">
+                                            <a href="{% url 'page' 'mitigations' %}" class="btn btn-light border">Cancel</a>
+                                            <button type="submit" class="btn btn-success">Update Mitigation</button>
+                                        </div>
+                                    </form>
+                                </div>
                         </div>
                     </div>
                 </div>
@@ -142,54 +157,69 @@
                     <div class="col-md-8">
                         <div class="card shadow-sm border-success border-top border-4">
                             <div class="card-header bg-white">
-                                <h4 class="text-success">Edit Mitigation Action</h4>
-                                <p class="text-muted mb-0 small">MIT-1</p>
-                            </div>
-                            <div class="card-body">
-                                <form method="post">
-                                    <input type="hidden" name="mitigation_id" value="1">
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">Risk *</label>
-                                        <select name="risk_id" class="form-select" required>
-                                            <option value="101" selected>RSK-101: Unauthorized access</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">Action Description *</label>
-                                        <textarea name="action_description" class="form-control" required>Install network segmentation</textarea>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label fw-bold">Assigned To *</label>
-                                            <select name="assigned_to" class="form-select" required>
-                                                <option value="2" selected>John Doe</option>
+                                    <h4 class="text-success">Edit Mitigation Action</h4>
+                                </div>
+                                <div class="card-body">
+                                    <form method="post" action="{% url 'edit_risk_mitigation' %}">
+                                        {% csrf_token %} 
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Risk *</label>
+                                            <select name="risk_id" class="form-select" required>
+                                                <option value="" selected>Select risk...</option>
+                                                {% for risk in risks %}
+                                                    <option value="{{ risk.risk_id }}">
+                                                        {{ risk.risk_id }} - {{ risk.risk_description }}
+                                                    </option>
+                                                {% endfor %}
                                             </select>
                                         </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label fw-bold">Target Date</label>
-                                            <input name="target_date" type="date" class="form-control" value="2026-05-15">
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Action Description *</label>
+                                            <textarea name="action_description" class="form-control" required></textarea>
                                         </div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">Progress Status</label>
-                                        <select name="mitigation_status_id" class="form-select">
-                                            <option value="2" selected>In Progress</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">Comments</label>
-                                        <textarea name="comments" class="form-control">Scheduled for Q2 maintenance window.</textarea>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">Effectiveness Review Date</label>
-                                        <input name="effectiveness_review_date" type="date" class="form-control" value="2026-07-01">
-                                    </div>
-                                    <div class="text-end">
-                                        <a href="mitigations.html" class="btn btn-light border">Cancel</a>
-                                        <button class="btn btn-success">Update Mitigation</button>
-                                    </div>
-                                </form>
-                            </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-bold">Assigned To *</label>
+                                                <select name="assigned_to" class="form-select" required>
+                                                   <option value="" selected>Select asset owner..</option>
+                                                        {% for owner in owners %}
+                                                            <option value="{{ owner }}">{{ owner }}</option>
+                                                        {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-bold">Target Date</label>
+                                                <input name="target_date" type="date" class="form-control" value="{{ mitigation.target_date|date:'Y-m-d' }}">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Progress Status</label>
+                                            <select name="mitigation_status_id" class="form-select">
+                                                <option value="Not Started" {% if mitigation.status_id == 'Not Started' %}selected{% endif %}>Not Started</option>
+                                                <option value="In Progress" >In Progress</option>
+                                                <option value="Completed" >Completed</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Comments</label>
+                                            <textarea name="comments" class="form-control">{{ mitigation.comments }}</textarea>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Effectiveness Review Date</label>
+                                            <input name="effectiveness_review_date" type="date" class="form-control" value="{{ mitigation.effectiveness_review_date|date:'Y-m-d' }}">
+                                        </div>
+                                        
+                                        <div class="text-end">
+                                            <a href="{% url 'page' 'mitigations' %}" class="btn btn-light border">Cancel</a>
+                                            <button type="submit" class="btn btn-success">Update Mitigation</button>
+                                        </div>
+                                    </form>
+                                </div>
                         </div>
                     </div>
                 </div>

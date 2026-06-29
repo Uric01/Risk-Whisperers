@@ -30,7 +30,7 @@
                             </li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'page' 'audit_logs' %}">Audit Logs</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{% url 'page' 'user_management' %}">User Management</a></li>
+                            
                         {% elif is_risk_manager %}
                                 <li class="nav-item"><a class="nav-link" href="{% url 'page' 'assets' %}">Assets</a></li>
                                 <li class="nav-item"><a class="nav-link active" href="{% url 'page' 'risks' %}">Risks</a></li>
@@ -120,24 +120,27 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- PYTHON: {% for risk in risks %} -->
-                <tr>
-                    <td>RSK-101</td>
-                    <td>Production Server A</td>
-                    <td>Unauthorized access to control network</td>
-                    <td>3</td><td>5</td><td>15</td>
-                    <td>Open</td>
-                    <td>2026-06-01</td>
+
+                {%for risk in risks%}
+                    <tr>
+                    <td name=>RSK-{{risk.risk_id}}</td>
+                    {%for asset in assets%}
+                        {%if asset.asset == risk.asset_id%}
+                            <td>{{asset.asset_name}}</td>
+                        {% endif %}
+                    {% endfor %}
+                    <td>{{risk.risk_description}}</td>
+                    <td>{{risk.likelihood}}</td><td>{{risk.impact}}</td><td>{{risk.risk_rating}}</td>
+                    <td>{{risk.risk_status}}</td>
+                    <td>{{risk.review_date}}</td>
                     <td class="text-end text-nowrap">
-                        <a class="btn btn-sm btn-outline-secondary" href="view_risk.html">View</a>
-                        <!-- PYTHON: {% if session.role == "Admin" %} -->
-                        <a class="btn btn-sm btn-outline-primary" href="edit_risk.html">Edit</a>
-                        <a class="btn btn-sm btn-outline-success" href="add_mitigation.html">Add Mitigation</a>
-                        <!-- PYTHON: ?risk_id={{ risk.id }} -->
-                        <!-- PYTHON: {% endif %} -->
+                        <a class="btn btn-sm btn-outline-secondary" href="{% url 'view_risk' risk.risk_id%}">View</a>
+                        <a class="btn btn-sm btn-outline-primary" href="{% url 'view_risk_edit' risk.risk_id%}">Edit</a>
+                        <a class="btn btn-sm btn-outline-success" href="{% url 'page' 'add_mitigation' %}">Add Mitigation</a>
                     </td>
                 </tr>
-                <!-- PYTHON: {% endfor %} -->
+                {% endfor %}
+              
             </tbody>
         </table>
     </div>

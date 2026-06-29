@@ -6,11 +6,7 @@
     <title>Risk Details - RiskSys</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="static/style.css">
-    <!-- PYTHON: @login_required
-         GET /risks/<id> — load risk with asset, status, treatment
-         Load annex controls for this risk_id from risk_annex_controls JOIN annex_controls
-         Load mitigations for this risk_id
-         404 if not found -->
+
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -33,7 +29,7 @@
                             </li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'page' 'audit_logs' %}">Audit Logs</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{% url 'page' 'user_management' %}">User Management</a></li>
+                            
                         {% elif is_risk_manager %}
                                 <li class="nav-item"><a class="nav-link" href="{% url 'page' 'assets' %}">Assets</a></li>
                                 <li class="nav-item"><a class="nav-link active" href="{% url 'page' 'risks' %}">Risks</a></li>
@@ -86,29 +82,26 @@
         <p class="text-muted mb-0">RSK-101</p>
     </div>
     <div class="d-flex gap-2">
-        <a href="risks.html" class="btn btn-light border">Back</a>
-        <!-- PYTHON: {% if session.role == "Admin" %} -->
-        <a href="edit_risk.html" class="btn btn-primary">Edit</a>
-        <a href="add_mitigation.html" class="btn btn-success">Add Mitigation</a>
-        <!-- PYTHON: {% endif %} -->
+        <a href="{% url 'page' 'risks' %}" class="btn btn-light border">Back</a>
     </div>
 </div>
 
 <div class="card shadow-sm mb-4">
     <div class="card-body">
         <dl class="row mb-0">
-            <dt class="col-sm-3">Asset</dt><dd class="col-sm-9">Production Server A</dd>
-            <dt class="col-sm-3">Description</dt><dd class="col-sm-9">Unauthorized access to control network</dd>
-            <dt class="col-sm-3">Likelihood</dt><dd class="col-sm-9">3</dd>
-            <dt class="col-sm-3">Impact</dt><dd class="col-sm-9">5</dd>
-            <dt class="col-sm-3">Risk Rating</dt><dd class="col-sm-9">15</dd>
-            <dt class="col-sm-3">Review Date</dt><dd class="col-sm-9">2026-06-01</dd>
-            <dt class="col-sm-3">Status</dt><dd class="col-sm-9">Open</dd>
-            <dt class="col-sm-3">Treatment</dt><dd class="col-sm-9">Mitigate</dd>
+            <dt class="col-sm-3">Asset</dt><dd class="col-sm-9">{{selected_risk.asset.asset_name}}</dd>
+            <dt class="col-sm-3">Description</dt><dd class="col-sm-9">{{selected_risk.risk_description}}</dd>
+            <dt class="col-sm-3">Likelihood</dt><dd class="col-sm-9">{{selected_risk.likelihood}}</dd>
+            <dt class="col-sm-3">Impact</dt><dd class="col-sm-9">{{selected_risk.impact}}</dd>
+            <dt class="col-sm-3">Risk Rating</dt><dd class="col-sm-9">{{selected_risk.risk_rating}}</dd>
+            <dt class="col-sm-3">Review Date</dt><dd class="col-sm-9">{{selected_risk.review_date}}</dd>
+            <dt class="col-sm-3">Status</dt><dd class="col-sm-9">{{selected_risk.risk_status}}</dd>
+            <dt class="col-sm-3">Treatment</dt><dd class="col-sm-9">{{selected_risk.risk_treatment}}</dd>
             <dt class="col-sm-3">Annex Controls</dt>
             <dd class="col-sm-9">
-                <!-- PYTHON: {% for c in controls %}<li>{{ c.code }} — {{ c.name }}</li>{% else %}—{% endfor %} -->
-                <ul class="mb-0"><li>A.5.1 — Policies for information security</li></ul>
+                {%for risk_cont in selected_risk.annex_control%}
+                    <ul class="mb-0"><li>{{risk_cont}}</li></ul>
+                {% endfor %}
             </dd>
         </dl>
     </div>
@@ -121,15 +114,15 @@
             <tr><th>ID</th><th>Action</th><th>Assigned To</th><th>Target Date</th><th>Status</th></tr>
         </thead>
         <tbody>
-            <!-- PYTHON: {% for m in mitigations %} -->
+          
             <tr>
-                <td>MIT-1</td>
-                <td>Install network segmentation</td>
-                <td>John Doe</td>
-                <td>2026-05-15</td>
-                <td>In Progress</td>
+                <td>MIT-{{ selected_risk.mitigations.first.mitigation_id }}</td>
+                <td>{{ selected_risk.mitigations.first.action_description }}</td>
+                <td>{{ selected_risk.mitigations.first.assigned_to_id }}</td>
+                <td>{{ selected_risk.mitigations.first.target_date }}</td>
+                <td>{{ selected_risk.mitigations.first.progress_status }}</td>
             </tr>
-            <!-- PYTHON: {% else %} empty row {% endfor %} -->
+
         </tbody>
     </table>
 </div>
