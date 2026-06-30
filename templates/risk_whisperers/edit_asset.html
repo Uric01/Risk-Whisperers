@@ -101,27 +101,30 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">Category *</label>
-                            <select name="category_id" class="form-select" required>
+                            <select name="asset_category" class="form-select" required>
                                
                                 <option value="IT" {% if asset.asset_category == 'IT' %}selected{% endif %}>IT</option>
+                                <option value="OT" {% if asset.asset_category == 'OT' %}selected{% endif %}>OT</option>
+                                <option value="Infrastructure" {% if asset.asset_category == 'Infrastructure' %}selected{% endif %}>Infrastructure</option>
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">Operational Status *</label>
-                            <select name="operational_status_id" class="form-select" required>
+                            <select name="operational_status" class="form-select" required>
                                 <option value="Active" {% if asset.asset_category == 'Active' %}selected{% endif %}>Active</option>
+                                <option value="Maintenance" {% if asset.asset_category == 'Maintenance' %}selected{% endif %}>Maintenance</option>
+                                <option value="Retired" {% if asset.asset_category == 'Retired' %}selected{% endif %}>Retired</option>
                             </select>
                         </div>
                     </div>
                     <div class="row bg-light rounded p-3 mb-4 mx-0 border">
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Classification</label>
-                            <select name="classification_id" class="form-select">
-                                <option value="" {%if asset.classification == "" %}select {% endif %}>Select...</option>
-                                <option value="PUBLIC" {%if asset.classification == PUBLIC %}select {% endif %}>PUBLIC</option>
-                                <option value="INTERNAL" {%if asset.classification == INTERNAL %}select {% endif %}>INTERNAL</option>
-                                <option value="CONFIDENTIAL" {%if asset.classification == CONFIDENTIAL %}select {% endif %}>CONFIDENTIAL</option>
-                                <option value="RESTRICTED" {%if asset.classification == RESTRICTED %}select {% endif %}>RESTRICTED</option>
+                            <select name="classification" class="form-select">
+                                <option value="Public" {%if asset.classification == Public %}select {% endif %}>Public</option>
+                                <option value="Internal" {%if asset.classification == Internal %}select {% endif %}>Internal</option>
+                                <option value="Confidential" {%if asset.classification == Confidential %}select {% endif %}>Confidential</option>
+                                <option value="Restricted" {%if asset.classification == Restricted %}select {% endif %}>Restricted</option>
                             </select>
                         </div>
                         <div class="col-md-6">

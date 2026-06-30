@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="{% url 'page' 'dashboard' %}"><i class="bi bi-shield-check me-2 text-info"></i>RiskSys</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
@@ -30,6 +30,7 @@
                             </li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
                             <li class="nav-item"><a class="nav-link active" href="{% url 'page' 'audit_logs' %}">Audit Logs</a></li>
+                            
                         {% elif is_risk_manager %}
                                 <li class="nav-item"><a class="nav-link" href="{% url 'page' 'assets' %}">Assets</a></li>
                                 <li class="nav-item"><a class="nav-link" href="{% url 'page' 'risks' %}">Risks</a></li>
@@ -96,9 +97,9 @@
                         <label class="form-label fw-bold">Action Type</label>
                         <select name="action_type" class="form-select">
                             <option value="">All Actions</option>
-                            <option>LOGIN</option>
-                            <option>CREATE</option>
-                            <option>UPDATE</option>
+                            <option value="LOGIN">LOGIN</option>
+                            <option value="CREATE">CREATE</option>
+                            <option value="UPDATE">UPDATE</option>
                         </select>
                     </div>
                     <div class="col-md-2">
@@ -125,15 +126,18 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>42</td>
-                                    <td>Admin User</td>
-                                    <td>LOGIN</td>
-                                    <td>User Session</td>
-                                    <td>1</td>
-                                    <td>2026-05-28 09:15:00</td>
-                                    <td>Successful login</td>
-                                </tr>
+                                {%for all_auditlog in all_auditlogs %}
+                                    <tr>
+                                        <td>{{all_auditlog.log_id}}</td>
+                                        <td>{{all_auditlog.user}}</td>
+                                        <td>{{all_auditlog.action_type}}</td>
+                                        <td>{{all_auditlog.entity_name}}</td>
+                                        <td>{{all_auditlog.entity_id}}</td>
+                                        <td>{{all_auditlog.action_date}}</td>
+                                        <td>{{all_auditlog.action_details}}</td>
+                                    </tr>
+                                {% endfor %}
+                                
                                 <tr>
                                     <td>41</td>
                                     <td>Admin User</td>
@@ -151,7 +155,7 @@
             {% elif is_risk_manager %}
                    
             {% elif is_auditor %}
-                    <form class="card card-body mb-4" method="get">
+              <form class="card card-body mb-4" method="get">
                 <div class="row g-3 align-items-end">
                     <div class="col-md-3">
                         <label class="form-label fw-bold">User</label>
@@ -163,9 +167,9 @@
                         <label class="form-label fw-bold">Action Type</label>
                         <select name="action_type" class="form-select">
                             <option value="">All Actions</option>
-                            <option>LOGIN</option>
-                            <option>CREATE</option>
-                            <option>UPDATE</option>
+                            <option value="LOGIN">LOGIN</option>
+                            <option value="CREATE">CREATE</option>
+                            <option value="UPDATE">UPDATE</option>
                         </select>
                     </div>
                     <div class="col-md-2">
@@ -192,15 +196,18 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>42</td>
-                                    <td>Admin User</td>
-                                    <td>LOGIN</td>
-                                    <td>User Session</td>
-                                    <td>1</td>
-                                    <td>2026-05-28 09:15:00</td>
-                                    <td>Successful login</td>
-                                </tr>
+                                {%for all_auditlog in all_auditlogs %}
+                                    <tr>
+                                        <td>{{all_auditlog.log_id}}</td>
+                                        <td>{{all_auditlog.user}}</td>
+                                        <td>{{all_auditlog.action_type}}</td>
+                                        <td>{{all_auditlog.entity_name}}</td>
+                                        <td>{{all_auditlog.entity_id}}</td>
+                                        <td>{{all_auditlog.action_date}}</td>
+                                        <td>{{all_auditlog.action_details}}</td>
+                                    </tr>
+                                {% endfor %}
+                                
                                 <tr>
                                     <td>41</td>
                                     <td>Admin User</td>
@@ -226,7 +233,7 @@
     {% else %}
 
     {% endif %}
-
+        </br></br>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

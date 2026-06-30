@@ -86,7 +86,7 @@
                 <p class="text-muted mb-0 small">RSK-{{selected_risk_to_edit.risk_id}}</p>
             </div>
             <div class="card-body">
-                <form method="post">
+                <form method="post" action="{% url 'edit_risk' selected_risk_to_edit.risk_id %}">
                      {% csrf_token %} 
                     <input type="hidden" name="risk_id" value="101">
                     <div class="mb-3">
@@ -121,11 +121,11 @@
                         </div>
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Risk Rating</label>
-                            <input type="text" id="risk_rating_display" class="form-control" readonly value="{{ selected_risk_to_edit.risk_rating }}">
+                            <input type="text" name="risk_rating" id="risk_rating_display" class="form-control" readonly value="{{ selected_risk_to_edit.risk_rating }}">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Status</label>
-                            <select name="risk_status_id" class="form-select">
+                            <select name="risk_status" class="form-select">
                                 <option value="Open" {% if mitigation.progress_status == 'Open' %}selected{% endif %}>
                                     Open
                                 </option>
@@ -144,7 +144,7 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">Treatment *</label>
-                            <select name="treatment_option" class="form-select" required>
+                            <select name="risk_treatment" class="form-select" required>
                                 <option value="Modify" {% if selected_risk_to_edit.risk_treatment == 'Modify' %}selected{% endif %}>
                                     Modify
                                 </option>
