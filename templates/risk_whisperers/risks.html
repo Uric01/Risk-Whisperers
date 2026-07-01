@@ -82,27 +82,30 @@
         <h2>Risk Register</h2>
         <p class="text-muted mb-0">Overview of identified risks.</p>
     </div>
-    <!-- PYTHON: {% if session.role == "Admin" %} -->
-    <a href="add_risk.html" class="btn btn-danger">Add Risk</a>
-    <!-- PYTHON: {% endif %} -->
+    <a href="{%url 'page' 'add_risk'%}" class="btn btn-danger">Add Risk</a>
 </div>
 
-<form class="card card-body mb-4" method="get">
+<form class="card card-body mb-4" method="get" action="{% url 'risk_filter' %}" >
     <div class="row g-3">
         <div class="col-md-4">
-            <input name="q" class="form-control" placeholder="Search Risk">
-            <!-- PYTHON: value from request.args.q -->
+            <input name="q" class="form-control" placeholder="Search Risk" value="{{ request.GET.q }}">
         </div>
         <div class="col-md-3">
-            <select name="asset_id" class="form-select">
+            <select name="asset_name_" class="form-select">
                 <option value="">All Assets</option>
-                <!-- PYTHON: {% for a in assets %}<option value="{{ a.id }}">{{ a.name }}</option>{% endfor %} -->
+                {% for asset in assets %}
+                    <option value="{{asset.asset_name}}" {% if request.GET.asset_name_ == "{{asset.asset_name}}" %}selected{% endif %}>
+                        {{asset.asset_name}}
+                    </option>
+                {% endfor %}
             </select>
         </div>
         <div class="col-md-3">
-            <select name="risk_status_id" class="form-select">
-                <option value="">All Statuses</option>
-                <!-- PYTHON: loop risk_statuses (Open, Mitigated, Closed) -->
+            <select name="risk_status" class="form-select">
+                <option value="" {% if request.GET.risk_status == "" %}selected{% endif %}>All Statuses</option>
+                <option value="OPEN" {% if request.GET.risk_status == "OPEN" %}selected{% endif %}>Open</option>
+                <option value="MITIGATED" {% if request.GET.risk_status == "MITIGATED" %}selected{% endif %}>Mitigated</option>
+                <option value="CLOSED" {% if request.GET.risk_status == "CLOSED" %}selected{% endif %}>Closed</option>
             </select>
         </div>
         <div class="col-md-2"><button class="btn btn-secondary w-100">Filter</button></div>
@@ -120,25 +123,26 @@
                 </tr>
             </thead>
             <tbody>
-
+                
                 {%for risk in risks%}
-                    <tr>
-                    <td name=>RSK-{{risk.risk_id}}</td>
                     {%for asset in assets%}
                         {%if asset.asset == risk.asset_id%}
-                            <td>{{asset.asset_name}}</td>
+                            <tr>
+                                <td name=>RSK-{{risk.risk_id}}</td>
+                                <td>{{asset.asset_name}}</td>
+                                <td>{{risk.risk_description}}</td>
+                                <td>{{risk.likelihood}}</td><td>{{risk.impact}}</td><td>{{risk.risk_rating}}</td>
+                                <td>{{risk.risk_status}}</td>
+                                <td>{{risk.review_date}}</td>
+                                <td class="text-end text-nowrap">
+                                    <a class="btn btn-sm btn-outline-secondary" href="{% url 'view_risk' risk.risk_id%}">View</a>
+                                    <a class="btn btn-sm btn-outline-primary" href="{% url 'view_risk_edit' risk.risk_id%}">Edit</a>
+                                    <a class="btn btn-sm btn-outline-success" href="{% url 'view_risk_add_mitigation' risk.risk_id %}">Add Mitigation</a>
+                                </td>                
+                            </tr>
                         {% endif %}
                     {% endfor %}
-                    <td>{{risk.risk_description}}</td>
-                    <td>{{risk.likelihood}}</td><td>{{risk.impact}}</td><td>{{risk.risk_rating}}</td>
-                    <td>{{risk.risk_status}}</td>
-                    <td>{{risk.review_date}}</td>
-                    <td class="text-end text-nowrap">
-                        <a class="btn btn-sm btn-outline-secondary" href="{% url 'view_risk' risk.risk_id%}">View</a>
-                        <a class="btn btn-sm btn-outline-primary" href="{% url 'view_risk_edit' risk.risk_id%}">Edit</a>
-                        <a class="btn btn-sm btn-outline-success" href="{% url 'page' 'add_mitigation' %}">Add Mitigation</a>
-                    </td>
-                </tr>
+           
                 {% endfor %}
               
             </tbody>

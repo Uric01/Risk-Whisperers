@@ -88,12 +88,20 @@
                                     {% csrf_token %}
                                     <div class="mb-3">
                                         <label class="form-label fw-bold">Risk *</label>
-                                        <select name="risk_id" class="form-select" required>
-                                            <option value="{" selected>Select risk...</option>
-                                            {% for risk in risks %}
-                                                <option value="{{ risk.risk_id }}">{{ risk.risk_description }}</option>
-                                            {% endfor %}
-                                        </select>
+                                        
+                                            {% if selected_risk_add_mitigation %}
+                                                <input name="risk_id" type="text" value="{{ selected_risk_add_mitigation.risk_description }}" class="form-control" readonly></input>
+                                            {% else %}
+                                                <select name="risk_id" class="form-select" required>
+                                                    <option value="{" selected>Select risk...</option>
+                                                    {% for risk in risks %}
+                                                        <option value="{{ risk.risk_id }}">
+                                                            {{ risk.risk_description }}
+                                                        </option>
+                                                    {% endfor %}
+                                                </select>
+                                            {% endif %}
+                                        
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label fw-bold">Action Description *</label>

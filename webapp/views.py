@@ -4,6 +4,7 @@ from users.models import Asset, Risk, Mitigation, AuditLog, ActionType, Operatio
 from django.contrib.auth.models import User
 from datetime import date
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 
 
 
@@ -170,7 +171,11 @@ def assets_filter(request):
     status = request.GET.get("status")
 
     if q:
-        all_assets = all_assets.filter(asset_name__icontains=q)
+        all_assets =  all_assets.filter( Q(asset_description__icontains=q) |
+        Q(asset_category__icontains=q) |
+        Q(asset_owner__icontains=q) |
+        Q(location__icontains=q) | 
+        Q(operational_status__icontains=q))
 
     if category:
         all_assets = all_assets.filter(asset_category=category)
@@ -204,54 +209,6 @@ def assets_filter(request):
     print("TOTAL ASSETS:", all_assets.count())
 
     return render(request, ALLOWED_PAGES['assets'], context)
-
-
-#Add Risk
-@login_required
-def add_risk(request):
-    
-    all_assets = Asset.objects.all()
-    all_risks = Risk.objects.all()
-    all_mitigations = Mitigation.objects.all()
-    target_dates = all_mitigations.values_list("target_date", flat=True)
-    current_date = date.today()
-    count = 0
-    for target_date in target_dates:
-        if current_date > target_date:
-            count += 1
-    all_auditlog = AuditLog.objects.all()
-    
-    if request.method == "POST":
-        asset_id = request.POST.get("asset")
-        selected_asset = Asset.objects.get(asset=asset_id)
-        new_risk = Risk.objects.create(
-            asset=selected_asset,
-            risk_description=request.POST.get("risk_description"),
-            risk_category=request.POST.get("risk_category"),
-            likelihood=request.POST.get("likelihood"),
-            impact=request.POST.get("impact"),
-            risk_rating=request.POST.get("risk_rating"),
-            risk_status=request.POST.get("risk_status"),
-            risk_treatment=request.POST.get("risk_treatment_option"),
-            risk_owner=request.POST.get("risk_owner"),
-            review_date=request.POST.get("review_date"),
-            annex_control=request.POST.get("control"),
-           
-        )
-        print(f"Asset saved with ID: {new_risk.asset}")
-        return redirect('page', page_name='risks')
-
-    user = request.user
-    context = {
-        "is_admin": user.groups.filter(name="Admin").exists() if user.is_authenticated else False,
-        "is_risk_manager": user.groups.filter(name="Risk_Manager").exists() if user.is_authenticated else False,
-        "is_auditor": user.groups.filter(name="Auditor").exists() if user.is_authenticated else False,
-        "is_viewer": user.groups.filter(name="viewer").exists() if user.is_authenticated else False,
-        "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
-        "assets":all_assets,
-        "risks": all_risks,
-    }
-    return render(request, ALLOWED_PAGES['add_risk'], context)
 
 @login_required
 def view_asset(request, asset_id):
@@ -333,6 +290,34 @@ def edit_asset(request, asset_id):
     }
     return render(request, ALLOWED_PAGES['edit_asset'], context)
 
+
+
+
+@login_required
+def add_asset_risk(request, asset_id):
+    
+    all_mitigations = Mitigation.objects.all()
+    target_dates = all_mitigations.values_list("target_date", flat=True)
+    current_date = date.today()
+    count = 0
+    for target_date in target_dates:
+        if current_date > target_date:
+            count += 1
+    
+    # Fetch the existing asset
+    selected_asset = get_object_or_404(Asset, asset=asset_id)
+
+    user = request.user
+    context = {
+        "selected_asset": selected_asset,
+        "is_admin": user.groups.filter(name="Admin").exists() if user.is_authenticated else False,
+        "is_risk_manager": user.groups.filter(name="Risk_Manager").exists() if user.is_authenticated else False,
+        "is_auditor": user.groups.filter(name="Auditor").exists() if user.is_authenticated else False,
+        "is_viewer": user.groups.filter(name="viewer").exists() if user.is_authenticated else False,
+        "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
+    }
+    return render(request, ALLOWED_PAGES['add_risk'], context)
+
 @login_required
 def add_risk(request):
     
@@ -344,7 +329,6 @@ def add_risk(request):
     for target_date in target_dates:
         if current_date > target_date:
             count += 1
-    all_auditlog = AuditLog.objects.all()
     
     if request.method == "POST":
         asset_id = request.POST.get("asset")
@@ -440,6 +424,59 @@ def edit_risk(request, risk_id):
     
     return render(request, ALLOWED_PAGES['edit_risk'], context)
 
+
+
+
+@login_required
+def risk_filter(request):
+    
+    all_assets = Asset.objects.all()
+    all_mitigations = Mitigation.objects.all()
+    all_risks = Risk.objects.all()
+    target_dates = all_mitigations.values_list("target_date", flat=True)
+    current_date = date.today()
+    count = 0
+    for target_date in target_dates:
+        if current_date > target_date:
+            count += 1
+    q = request.GET.get("q")
+    asset_name_ = request.GET.get("asset_name_")
+    risk_status = request.GET.get("risk_status")
+
+    if q:
+        all_risks = all_risks.filter( Q(risk_description__icontains=q) |
+        Q(risk_owner__icontains=q) |
+        Q(risk_status__icontains=q) |
+        Q(asset__asset_name__icontains=q))
+
+    if asset_name_:
+        all_assets = all_assets.filter(asset_name=asset_name_)
+
+    if risk_status:
+        all_risks = all_risks.filter(risk_status=risk_status)
+    
+    if q and risk_status:
+        all_risks = all_risks.filter(risk_description__icontains=q).filter(risk_status=risk_status)
+        
+
+    user = request.user
+    
+    context = {
+        "is_admin": user.groups.filter(name="Admin").exists() if user.is_authenticated else False,
+        "is_risk_manager": user.groups.filter(name="Risk_Manager").exists() if user.is_authenticated else False,
+        "is_auditor": user.groups.filter(name="Auditor").exists() if user.is_authenticated else False,
+        "is_viewer": user.groups.filter(name="viewer").exists() if user.is_authenticated else False,
+        "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
+        "assets": all_assets, # FIXED: Changed from "asset_filter"
+        "risks" : all_risks,
+    }
+    
+    print("TOTAL ASSETS:", all_assets.count())
+
+    return render(request, ALLOWED_PAGES['risks'], context)
+
+
+
 @login_required
 def view_risk(request, risk_id):
     
@@ -499,6 +536,37 @@ def view_risk_edit(request, risk_id):
     }
     
     return render(request, ALLOWED_PAGES['edit_risk'], context)
+
+
+@login_required
+def view_risk_add_mitigation(request, risk_id):
+    
+    all_assets = Asset.objects.all()
+    all_risks = Risk.objects.all()
+    all_mitigations = Mitigation.objects.all()
+    target_dates = all_mitigations.values_list("target_date", flat=True)
+    current_date = date.today()
+    count = 0
+    for target_date in target_dates:
+        if current_date > target_date:
+            count += 1
+    
+    selected_risk_add_mitigation = get_object_or_404(Risk, risk_id=risk_id)
+    
+    user = request.user
+    context = {
+        "selected_risk_add_mitigation": selected_risk_add_mitigation,
+        "is_admin": user.groups.filter(name="Admin").exists() if user.is_authenticated else False,
+        "is_risk_manager": user.groups.filter(name="Risk_Manager").exists() if user.is_authenticated else False,
+        "is_auditor": user.groups.filter(name="Auditor").exists() if user.is_authenticated else False,
+        "is_viewer": user.groups.filter(name="viewer").exists() if user.is_authenticated else False,
+        "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
+        "risks": all_risks,
+        "assets": all_assets,
+        "mitigations":all_mitigations,
+    }
+    
+    return render(request, ALLOWED_PAGES['add_mitigation'], context)
 
 @login_required
 def add_mitigation(request):

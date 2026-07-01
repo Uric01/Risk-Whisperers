@@ -35,10 +35,10 @@ class CiaRating(models.TextChoices):
     HIGH = 'HIGH', 'High'
 
 class RiskTreatment(models.TextChoices):
-    MODIFY = 'Modify', 'Modify'
-    RETAIN = 'Retain', 'Retain'
-    AVOID = 'Avoid', 'Avoid'
-    SHARE = 'Share', 'Share'
+    MODIFY = 'MODIFY', 'Modify'
+    RETAIN = 'RETAIN', 'Retain'
+    AVOID = 'AVOID', 'Avoid'
+    SHARE = 'SHARE', 'Share'
     
 class RiskStatus(models.TextChoices):
     OPEN = 'OPEN', 'Open'

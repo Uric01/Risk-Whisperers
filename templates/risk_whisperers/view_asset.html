@@ -90,11 +90,8 @@
     </div>
     <div class="d-flex gap-2">
         <a href="{% url 'page' 'assets' %}" class="btn btn-light border">Back</a>
-        <!-- PYTHON: {% if session.role == "Admin" %} -->
-        <a href="edit_asset.html" class="btn btn-primary">Edit</a>
-        <a href="add_risk.html" class="btn btn-danger">Add Risk</a>
-        <!-- PYTHON: add_risk with ?asset_id={{ asset.id }} -->
-        <!-- PYTHON: {% endif %} -->
+        <a href="{% url 'edit_asset' asset.asset %}" class="btn btn-primary">Edit</a>
+        <a href="{% url 'add_asset_risk' asset.asset %}" class="btn btn-danger">Add Risk</a>
     </div>
 </div>
 
