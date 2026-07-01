@@ -86,28 +86,27 @@
     <div class="row g-3 align-items-end">
         <div class="col-md-3">
             <label class="form-label fw-bold">Date From</label>
-            <input type="date" name="date_from" class="form-control">
+            <input type="date" name="date_from" class="form-control" value="{{ selected_date_from }}">
         </div>
         <div class="col-md-3">
             <label class="form-label fw-bold">Date To</label>
-            <input type="date" name="date_to" class="form-control">
+            <input type="date" name="date_to" class="form-control" value="{{ selected_date_to }}">
         </div>
         <div class="col-md-3">
             <label class="form-label fw-bold">Asset Category</label>
             <select name="category" class="form-select">
-                <option value="">All Categories</option>
-                {% for asset_cat in asset_categories%}
-                    <option value="{asset_cat}">{{asset_cat}}</option>
+                <option value="" {% if not selected_category %}selected{% endif %}>All Categories</option>
+                {% for asset_cat in asset_categories %}
+                    <option value="{{ asset_cat }}" {% if selected_category == asset_cat %}selected{% endif %}>{{ asset_cat }}</option>
                 {% endfor %}
-
             </select>
         </div>
         <div class="col-md-3">
             <label class="form-label fw-bold">Risk Status</label>
             <select name="risk_status" class="form-select">
-                <option value="">All Statuses</option>
-                {% for all_risks_status in all_risks_statuses%}
-                    <option value="{all_risks_status}">{{all_risks_status}}</option>
+                <option value="" {% if not selected_risk_status %}selected{% endif %}>All Statuses</option>
+                {% for risk_status_option in all_risks_statuses %}
+                    <option value="{{ risk_status_option }}" {% if selected_risk_status == risk_status_option %}selected{% endif %}>{{ risk_status_option }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -117,14 +116,14 @@
             <button type="submit" name="generate" value="1" class="btn btn-primary">Generate Report</button>
             {% if user.is_authenticated %}
                         {% if is_admin %}
-                            <a href="{% url 'page' 'report_print' %}" class="btn btn-outline-success" target="_blank">Export Excel</a>
-                            <a href="{% url 'page' 'report_print' %}" class="btn btn-outline-danger" target="_blank">Export PDF</a>
+                            <a href="{% url 'report_export' 'excel' %}?date_from={{ selected_date_from }}&date_to={{ selected_date_to }}&category={{ selected_category }}&risk_status={{ selected_risk_status }}" class="btn btn-outline-success" target="_blank">Export Excel</a>
+                            <a href="{% url 'report_export' 'pdf' %}?date_from={{ selected_date_from }}&date_to={{ selected_date_to }}&category={{ selected_category }}&risk_status={{ selected_risk_status }}" class="btn btn-outline-danger" target="_blank">Export PDF</a>
                         {% elif is_risk_manager %}
-                            <a href="{% url 'page' 'report_print' %}"class="btn btn-outline-success" target="_blank">Export Excel</a>
-                            <a href="{% url 'page' 'report_print' %}" class="btn btn-outline-danger" target="_blank">Export PDF</a>
+                            <a href="{% url 'report_export' 'excel' %}?date_from={{ selected_date_from }}&date_to={{ selected_date_to }}&category={{ selected_category }}&risk_status={{ selected_risk_status }}" class="btn btn-outline-success" target="_blank">Export Excel</a>
+                            <a href="{% url 'report_export' 'pdf' %}?date_from={{ selected_date_from }}&date_to={{ selected_date_to }}&category={{ selected_category }}&risk_status={{ selected_risk_status }}" class="btn btn-outline-danger" target="_blank">Export PDF</a>
                         {% elif is_auditor %}
-                            <a href="{% url 'page' 'report_print' %}" class="btn btn-outline-success" target="_blank">Export Excel</a>
-                            <a href="{% url 'page' 'report_print' %}" class="btn btn-outline-danger" target="_blank">Export PDF</a>
+                            <a href="{% url 'report_export' 'excel' %}?date_from={{ selected_date_from }}&date_to={{ selected_date_to }}&category={{ selected_category }}&risk_status={{ selected_risk_status }}" class="btn btn-outline-success" target="_blank">Export Excel</a>
+                            <a href="{% url 'report_export' 'pdf' %}?date_from={{ selected_date_from }}&date_to={{ selected_date_to }}&category={{ selected_category }}&risk_status={{ selected_risk_status }}" class="btn btn-outline-danger" target="_blank">Export PDF</a>
                         {% elif is_viewer %}
                                 
                         {% elif is_owner %}

@@ -85,33 +85,36 @@
 
 {% if user.is_authenticated %}
             {% if is_admin %}
-            <form class="card card-body mb-4" method="get">
+            <form class="card card-body mb-4" method="get" action="{% url 'audit_log_filter' %}">
                 <div class="row g-3 align-items-end">
                     <div class="col-md-3">
                         <label class="form-label fw-bold">User</label>
                         <select name="user_id" class="form-select">
-                            <option value="">All Users</option>
+                           <option value="" {% if not selected_user_id %}selected{% endif %}>All Users</option>
+                            {% for user in all_users %}
+                                <option value="{{ user.id }}" {% if selected_user_id == user.id|stringformat:"s" %}selected{% endif %}>{{ user.username }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fw-bold">Action Type</label>
                         <select name="action_type" class="form-select">
-                            <option value="">All Actions</option>
-                            <option value="LOGIN">LOGIN</option>
-                            <option value="CREATE">CREATE</option>
-                            <option value="UPDATE">UPDATE</option>
+                            <option value="" {% if not selected_action_type %}selected{% endif %}>All Actions</option>
+                            <option value="LOGIN" {% if selected_action_type == 'LOGIN' %}selected{% endif %}>LOGIN</option>
+                            <option value="CREATE" {% if selected_action_type == 'CREATE' %}selected{% endif %}>CREATE</option>
+                            <option value="UPDATE" {% if selected_action_type == 'UPDATE' %}selected{% endif %}>UPDATE</option>
                         </select>
                     </div>
                     <div class="col-md-2">
                         <label class="form-label fw-bold">Date From</label>
-                        <input type="date" name="date_from" class="form-control">
+                        <input type="date" name="date_from" class="form-control" value="{{ selected_date_from }}">
                     </div>
                     <div class="col-md-2">
                         <label class="form-label fw-bold">Date To</label>
-                        <input type="date" name="date_to" class="form-control">
+                        <input type="date" name="date_to" class="form-control" value="{{ selected_date_to }}">
                     </div>
                     <div class="col-md-2">
-                        <button class="btn btn-secondary w-100">Apply Filters</button>
+                        <button type="submit" class="btn btn-secondary w-100">Apply Filters</button>
                     </div>
                 </div>
             </form>
@@ -126,7 +129,9 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {%for all_auditlog in all_auditlogs %}
+                                {% if all_auditlogs  %}
+                                
+                                    {%for all_auditlog in all_auditlogs %}
                                     <tr>
                                         <td>{{all_auditlog.log_id}}</td>
                                         <td>{{all_auditlog.user}}</td>
@@ -137,16 +142,9 @@
                                         <td>{{all_auditlog.action_details}}</td>
                                     </tr>
                                 {% endfor %}
-                                
-                                <tr>
-                                    <td>41</td>
-                                    <td>Admin User</td>
-                                    <td>CREATE</td>
-                                    <td>Asset</td>
-                                    <td>12</td>
-                                    <td>2026-05-27 14:30:00</td>
-                                    <td>Created asset Production Server A</td>
-                                </tr>
+                                {% else %}
+                                    <tr><td colspan="7" class="text-center">No audit logs found.</td></tr>
+                                {% endif %}
                             </tbody>
                         </table>
                     </div>
@@ -155,33 +153,36 @@
             {% elif is_risk_manager %}
                    
             {% elif is_auditor %}
-              <form class="card card-body mb-4" method="get">
+              <form class="card card-body mb-4" method="get" action="{% url 'audit_log_filter' %}">
                 <div class="row g-3 align-items-end">
                     <div class="col-md-3">
                         <label class="form-label fw-bold">User</label>
                         <select name="user_id" class="form-select">
-                            <option value="">All Users</option>
+                            <option value="" {% if not selected_user_id %}selected{% endif %}>All Users</option>
+                             {% for user in all_users %}
+                                <option value="{{ user.id }}" {% if selected_user_id == user.id|stringformat:"s" %}selected{% endif %}>{{ user.username }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fw-bold">Action Type</label>
                         <select name="action_type" class="form-select">
-                            <option value="">All Actions</option>
-                            <option value="LOGIN">LOGIN</option>
-                            <option value="CREATE">CREATE</option>
-                            <option value="UPDATE">UPDATE</option>
+                            <option value="" {% if not selected_action_type %}selected{% endif %}>All Actions</option>
+                            <option value="LOGIN" {% if selected_action_type == 'LOGIN' %}selected{% endif %}>LOGIN</option>
+                            <option value="CREATE" {% if selected_action_type == 'CREATE' %}selected{% endif %}>CREATE</option>
+                            <option value="UPDATE" {% if selected_action_type == 'UPDATE' %}selected{% endif %}>UPDATE</option>
                         </select>
                     </div>
                     <div class="col-md-2">
                         <label class="form-label fw-bold">Date From</label>
-                        <input type="date" name="date_from" class="form-control">
+                        <input type="date" name="date_from" class="form-control" value="{{ selected_date_from }}">
                     </div>
                     <div class="col-md-2">
                         <label class="form-label fw-bold">Date To</label>
-                        <input type="date" name="date_to" class="form-control">
+                        <input type="date" name="date_to" class="form-control" value="{{ selected_date_to }}">
                     </div>
                     <div class="col-md-2">
-                        <button class="btn btn-secondary w-100">Apply Filters</button>
+                        <button type="submit" class="btn btn-secondary w-100">Apply Filters</button>
                     </div>
                 </div>
             </form>
@@ -196,7 +197,9 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {%for all_auditlog in all_auditlogs %}
+                                {% if all_auditlogs  %}
+                                
+                                    {%for all_auditlog in all_auditlogs %}
                                     <tr>
                                         <td>{{all_auditlog.log_id}}</td>
                                         <td>{{all_auditlog.user}}</td>
@@ -207,16 +210,11 @@
                                         <td>{{all_auditlog.action_details}}</td>
                                     </tr>
                                 {% endfor %}
+                                {% else %}
+                                    <tr><td colspan="7" class="text-center">No audit logs found.</td></tr>
+                                {% endif %}
                                 
-                                <tr>
-                                    <td>41</td>
-                                    <td>Admin User</td>
-                                    <td>CREATE</td>
-                                    <td>Asset</td>
-                                    <td>12</td>
-                                    <td>2026-05-27 14:30:00</td>
-                                    <td>Created asset Production Server A</td>
-                                </tr>
+                                
                             </tbody>
                         </table>
                     </div>

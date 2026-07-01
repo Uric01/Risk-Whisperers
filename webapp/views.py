@@ -1,10 +1,12 @@
-from django.http import Http404
+import csv
+from io import BytesIO, StringIO
+from django.http import Http404, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from users.models import Asset, Risk, Mitigation, AuditLog, ActionType, OperationalStatus
 from django.contrib.auth.models import User
-from datetime import date
+from datetime import date, datetime
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.db.models import Q, Min
 
 
 
@@ -59,7 +61,7 @@ def page(request, page_name):
     for target_date in target_dates:
         if current_date > target_date:
             count += 1
-    all_auditlog = AuditLog.objects.all()
+    all_auditlog = AuditLog.objects.all().order_by('-action_date')
     
     asset_owners = User.objects.filter(groups__name="Asset_Owner").values_list('username', flat=True)
     asset_owner_list = list(asset_owners)
@@ -73,6 +75,7 @@ def page(request, page_name):
     if not template:
         raise Http404('Page not found')
     user = request.user
+    all_users = User.objects.all()
     context = {
         "is_admin": user.groups.filter(name="Admin").exists() if user.is_authenticated else False,
         "is_risk_manager": user.groups.filter(name="Risk_Manager").exists() if user.is_authenticated else False,
@@ -92,6 +95,7 @@ def page(request, page_name):
         "report_data":report_data,
         "total_completed_mitigations":total_completed_mitigations,
         'all_auditlogs': all_auditlog,
+        'all_users': all_users,
     }
     return render(request, template, context)
 
@@ -209,6 +213,71 @@ def assets_filter(request):
     print("TOTAL ASSETS:", all_assets.count())
 
     return render(request, ALLOWED_PAGES['assets'], context)
+
+
+
+@login_required
+def audit_log_filter(request):
+    
+    all_assets = Asset.objects.all()
+    all_mitigations = Mitigation.objects.all()
+    target_dates = all_mitigations.values_list("target_date", flat=True)
+    current_date = date.today()
+    count = 0
+    for target_date in target_dates:
+        if current_date > target_date:
+            count += 1
+    
+    # Grab the values from the HTML form
+    date_from = request.GET.get("date_from")
+    date_to = request.GET.get("date_to")
+    user_id = request.GET.get("user_id")
+    action_type = request.GET.get("action_type")
+    all_auditlogs = AuditLog.objects.select_related("user").all().order_by('-action_date')
+    earliest_date = all_auditlogs.aggregate(Min('action_date'))['action_date__min']
+
+    # 3. Apply the Date Filters
+    if date_from:
+        # Converts the DateTime in the DB to a Date for accurate comparison
+        all_auditlogs = all_auditlogs.filter(action_date__date__gte=date_from)
+
+    if date_to:
+        all_auditlogs = all_auditlogs.filter(action_date__date__lte=date_to)
+
+    # 4. Apply the other filters while we are at it!
+    if action_type:
+        all_auditlogs = all_auditlogs.filter(action_type=action_type)
+
+    if user_id:
+        all_auditlogs = all_auditlogs.filter(user_id=user_id)
+
+    user = request.user
+    all_users = User.objects.all()
+
+    context = {
+        "is_admin": user.groups.filter(name="Admin").exists() if user.is_authenticated else False,
+        "is_risk_manager": user.groups.filter(name="Risk_Manager").exists() if user.is_authenticated else False,
+        "is_auditor": user.groups.filter(name="Auditor").exists() if user.is_authenticated else False,
+        "is_viewer": user.groups.filter(name="viewer").exists() if user.is_authenticated else False,
+        "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
+        "assets": all_assets,
+        "all_auditlogs": all_auditlogs,
+        "all_users": all_users,
+        "selected_user_id": user_id or "",
+        "selected_action_type": action_type or "",
+        "selected_date_from": date_from or "",
+        "selected_date_to": date_to or "",
+        "current_date": current_date,
+        "earliest_date": earliest_date,
+    }
+    
+    print("TOTAL ASSETS:", all_assets.count())
+
+    return render(request, ALLOWED_PAGES['audit_logs'], context)
+
+
+
+
 
 @login_required
 def view_asset(request, asset_id):
@@ -732,68 +801,188 @@ def edit_risk_mitigation(request):
 
 @login_required
 def report_filter(request):
-    
-    
-    all_assets = Asset.objects.all()
-    all_mitigations = Mitigation.objects.all()
-    target_dates = all_mitigations.values_list("target_date", flat=True)
-    current_date = date.today()
-    count = 0
-    for target_date in target_dates:
-        if current_date > target_date:
-            count += 1
-    
-    
-    all_assets = Asset.objects.all()
-    q = request.GET.get("q")
+    all_mitigations = Mitigation.objects.select_related("risk", "risk__asset").all()
+    date_from = request.GET.get("date_from")
+    date_to = request.GET.get("date_to")
     category = request.GET.get("category")
-    status = request.GET.get("risk_status")
+    risk_status = request.GET.get("risk_status")
 
-    if q:
-        all_assets = all_assets.filter(asset_name__icontains=q)
-        total_assets = all_assets.count()
+    if date_from:
+        all_mitigations = all_mitigations.filter(target_date__gte=date_from)
+
+    if date_to:
+        all_mitigations = all_mitigations.filter(target_date__lte=date_to)
 
     if category:
-        all_assets = all_assets.filter(asset_category=category)
-        total_assets = all_assets.count()
+        all_mitigations = all_mitigations.filter(risk__asset__asset_category=category)
 
-    if status:
-        all_assets = all_assets.filter(operational_status=status)
-        total_assets = all_assets.count()
-    
-    if category and status:
-        all_assets = all_assets.filter(asset_category=category).filter(operational_status=status)
-        total_assets = all_assets.count()
-        
-    if q and category and status:
-        all_assets = all_assets.filter(asset_category=category).filter(operational_status=status).filter(asset_name__icontains=q)
-        total_assets = all_assets.count()
-        
-    if q and category:
-        all_assets = all_assets.filter(asset_category=category).filter(asset_name__icontains=q)
-        total_assets = all_assets.count()
+    if risk_status:
+        all_mitigations = all_mitigations.filter(risk__risk_status=risk_status)
 
-    if q and status:
-        all_assets = all_assets.filter(operational_status=status).filter(asset_name__icontains=q)
-        total_assets = all_assets.count()
+    report_data = [
+        {
+            "category": mitigation.risk.asset.asset_category,
+            "asset": mitigation.risk.asset.asset_name,
+            "risk_id": mitigation.risk.risk_id,
+            "rating": mitigation.risk.risk_rating,
+            "status": mitigation.risk.risk_status,
+            "target_date": mitigation.target_date,
+        }
+        for mitigation in all_mitigations
+    ]
+
+    current_date = date.today()
+    overdue_mitigations_count = sum(1 for item in report_data if item["target_date"] < current_date and item["status"] != "CLOSED")
+
+    all_assets = Asset.objects.all()
+    all_risks = Risk.objects.all()
+    all_risks_statuses = Risk.objects.values_list("risk_status", flat=True)
+    asset_categories = Asset.objects.values_list("asset_category", flat=True)
 
     total_assets = all_assets.count()
-    
+    total_risks = all_risks.count()
+    total_open_risks = all_risks.filter(risk_status="OPEN").count()
+
     user = request.user
-    
     context = {
         "is_admin": user.groups.filter(name="Admin").exists() if user.is_authenticated else False,
         "is_risk_manager": user.groups.filter(name="Risk_Manager").exists() if user.is_authenticated else False,
         "is_auditor": user.groups.filter(name="Auditor").exists() if user.is_authenticated else False,
         "is_viewer": user.groups.filter(name="viewer").exists() if user.is_authenticated else False,
         "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
-        "assets": all_assets, # FIXED: Changed from "asset_filter"
-        "total_assets": total_assets
+        "report_data": report_data,
+        "asset_categories": asset_categories,
+        "all_risks_statuses": all_risks_statuses,
+        "total_assets": total_assets,
+        "total_risks": total_risks,
+        "total_open_risks": total_open_risks,
+        "overdue_mitigations_count": overdue_mitigations_count,
+        "selected_date_from": date_from or "",
+        "selected_date_to": date_to or "",
+        "selected_category": category or "",
+        "selected_risk_status": risk_status or "",
     }
-    
-    print("TOTAL ASSETS:", all_assets.count())
 
     return render(request, ALLOWED_PAGES['reports'], context)
+
+
+@login_required
+def report_export(request, file_format):
+    date_from = request.GET.get("date_from")
+    date_to = request.GET.get("date_to")
+    category = request.GET.get("category")
+    risk_status = request.GET.get("risk_status")
+
+    all_mitigations = Mitigation.objects.select_related("risk", "risk__asset").all()
+    if date_from:
+        all_mitigations = all_mitigations.filter(target_date__gte=date_from)
+    if date_to:
+        all_mitigations = all_mitigations.filter(target_date__lte=date_to)
+    if category:
+        all_mitigations = all_mitigations.filter(risk__asset__asset_category=category)
+    if risk_status:
+        all_mitigations = all_mitigations.filter(risk__risk_status=risk_status)
+
+    report_rows = [
+        {
+            "category": mitigation.risk.asset.asset_category,
+            "asset": mitigation.risk.asset.asset_name,
+            "risk_id": f"RSK-{mitigation.risk.risk_id}",
+            "rating": mitigation.risk.risk_rating,
+            "status": mitigation.risk.risk_status,
+            "target_date": mitigation.target_date,
+        }
+        for mitigation in all_mitigations
+    ]
+
+    if file_format == "excel":
+        output = StringIO()
+        writer = csv.writer(output)
+        writer.writerow(["Category", "Asset", "Risk ID", "Rating", "Status", "Target Date"])
+        for row in report_rows:
+            writer.writerow([row["category"], row["asset"], row["risk_id"], row["rating"], row["status"], row["target_date"]])
+
+        response = HttpResponse(output.getvalue(), content_type="text/csv; charset=utf-8")
+        response["Content-Disposition"] = 'attachment; filename="risk_report.csv"'
+        return response
+
+    if file_format == "pdf":
+        from reportlab.lib import colors
+        from reportlab.lib.pagesizes import letter
+        from reportlab.lib.styles import getSampleStyleSheet
+        from reportlab.lib.units import inch
+        from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+
+        response = HttpResponse(content_type="application/pdf")
+        response["Content-Disposition"] = 'attachment; filename="risk_report.pdf"'
+
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=0.5 * inch, leftMargin=0.5 * inch, topMargin=0.5 * inch, bottomMargin=0.5 * inch)
+        styles = getSampleStyleSheet()
+        title_style = styles['Title']
+        title_style.fontSize = 16
+        title_style.leading = 20
+        body_style = styles['BodyText']
+        body_style.fontSize = 9
+
+        total_assets = Asset.objects.count()
+        total_risks = Risk.objects.count()
+        total_open_risks = Risk.objects.filter(risk_status='OPEN').count()
+        overdue_mitigations_count = sum(1 for row in report_rows if row['target_date'] < date.today() and row['status'] != 'CLOSED')
+
+        summary_data = [
+            [Paragraph('<b>Total Assets</b><br/><font size=14>{}</font>'.format(total_assets)), Paragraph('<b>Total Risks</b><br/><font size=14>{}</font>'.format(total_risks))],
+            [Paragraph('<b>Open Risks</b><br/><font size=14>{}</font>'.format(total_open_risks)), Paragraph('<b>Overdue Mitigations</b><br/><font size=14>{}</font>'.format(overdue_mitigations_count))],
+        ]
+        summary_table = Table(summary_data, colWidths=[2.7 * inch, 2.7 * inch], rowHeights=[0.7 * inch, 0.7 * inch])
+        summary_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, -1), colors.whitesmoke),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.lightgrey),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ]))
+
+        table_data = [["Category", "Asset", "Risk ID", "Rating", "Status", "Target Date"]]
+        for row in report_rows:
+            table_data.append([row['category'], row['asset'], row['risk_id'], row['rating'], row['status'], row['target_date']])
+
+        table = Table(table_data, repeatRows=1, colWidths=[0.8 * inch, 1.4 * inch, 0.8 * inch, 0.6 * inch, 0.9 * inch, 1.0 * inch])
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#0d6efd')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.whitesmoke, colors.white]),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+        ]))
+
+        exported_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        exported_by = request.user.get_full_name() or request.user.username if request.user.is_authenticated else 'Anonymous'
+
+        story = [
+            Paragraph('Reports & Compliance View', title_style),
+            Paragraph('Systemic risk report with filters and export.', body_style),
+            Paragraph(f"Exported at: {exported_at}", body_style),
+            Paragraph(f"Exported by: {exported_by}", body_style),
+            Spacer(1, 0.1 * inch),
+            Paragraph(
+                f"Filters: Date From: {date_from or 'All'} | Date To: {date_to or 'All'} | Asset Category: {category or 'All'} | Risk Status: {risk_status or 'All'}",
+                body_style,
+            ),
+            Spacer(1, 0.15 * inch),
+            summary_table,
+            Spacer(1, 0.2 * inch),
+            table,
+        ]
+        doc.build(story)
+        response.write(buffer.getvalue())
+        return response
+
+    return HttpResponse("Unsupported format", status=400)
 
 
 def log_event(user, action_type, entity_name, entity_id, details):

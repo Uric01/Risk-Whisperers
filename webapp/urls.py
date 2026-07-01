@@ -10,6 +10,7 @@ urlpatterns = [
     path('risk/edit_risk/<int:risk_id>', views.edit_risk, name='edit_risk'),
     path('risk/view_risk/<int:risk_id>/', views.view_risk, name='view_risk'),
     path('report/report_filter', views.report_filter, name='report_filter'),
+    path('report/export/<str:file_format>/', views.report_export, name='report_export'),
     path('risk/edit_risk_mitigation', views.edit_risk_mitigation, name='edit_risk_mitigation'),
     path('mitigation/view_mitigation', views.view_mitigations, name='view_mitigation'),
     path('mitigation/add_mitigation', views.add_mitigation, name='add_mitigation'),
@@ -19,6 +20,7 @@ urlpatterns = [
     path('risk/add_risk', views.add_risk, name = 'add_risk'),
     path('asset/asset_filter', views.assets_filter, name = 'assets_filter'),
     path('risk/risk_filter', views.risk_filter, name='risk_filter'),
+    path('audit/audit_log_filter', views.audit_log_filter, name='audit_log_filter'),
     path('', views.home, name='home'),
     path('<slug:page_name>', views.page, name='page'),
     
