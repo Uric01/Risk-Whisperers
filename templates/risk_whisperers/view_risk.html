@@ -99,9 +99,15 @@
             <dt class="col-sm-3">Treatment</dt><dd class="col-sm-9">{{selected_risk.risk_treatment}}</dd>
             <dt class="col-sm-3">Annex Controls</dt>
             <dd class="col-sm-9">
-                {%for risk_cont in selected_risk.annex_control%}
-                    <ul class="mb-0"><li>{{risk_cont}}</li></ul>
-                {% endfor %}
+                {% if annex_controls %}
+                    <ul class="mb-0">
+                        {% for risk_cont in annex_controls %}
+                            <li>{{ risk_cont }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <span class="text-muted">None</span>
+                {% endif %}
             </dd>
         </dl>
     </div>

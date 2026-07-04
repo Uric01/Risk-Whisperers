@@ -178,7 +178,13 @@
                     <div class="row">
                         <div class="col-md-6 mb-4">
                             <label class="form-label fw-bold">Owner *</label>
-                            <input name="asset_owner" class="form-control" required>
+                            <select name="owner" class="form-select" required>
+                                <!-- PYTHON: loop owners from DB -->
+                                 <option value="">Assign owner...</option>
+                                 {% for all_username in all_usernames %}
+                                    <Option value="{{ all_username }}">{{ all_username }}</option>
+                                 {% endfor %}
+                            </select>
                         </div>
                         <div class="col-md-6 mb-4">
                             <label class="form-label fw-bold">Location</label>

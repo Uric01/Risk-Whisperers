@@ -6,6 +6,7 @@ from users.models import Asset, Risk, Mitigation, AuditLog, ActionType, Operatio
 from django.contrib.auth.models import User
 from datetime import date, datetime
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.db.models import Q, Min
 
 
@@ -43,6 +44,22 @@ report_data = [
     }
     for m in Mitigation.objects.select_related("risk", "risk__asset")
 ]
+
+
+def get_report_date_defaults():
+    created_dates = [
+        Asset.objects.aggregate(Min("created_at"))["created_at__min"],
+        Risk.objects.aggregate(Min("created_at"))["created_at__min"],
+        Mitigation.objects.aggregate(Min("created_at"))["created_at__min"],
+    ]
+    earliest_created = min((value for value in created_dates if value), default=datetime.today(), key=lambda value: value)
+
+    if hasattr(earliest_created, "date"):
+        earliest_created = earliest_created.date()
+
+    return earliest_created.strftime("%Y-%m-%d"), date.today().strftime("%Y-%m-%d")
+
+
 @login_required
 def home(request):
     return render(request, ALLOWED_PAGES['login'])
@@ -51,9 +68,11 @@ def home(request):
 def page(request, page_name):
     all_assets = Asset.objects.all()
     all_risks = Risk.objects.all()
+    recent_risks = all_risks.order_by('-risk_rating', '-risk_id')[:5]
     all_mitigations = Mitigation.objects.all()
     all_asset_categories = Asset.objects.values_list("asset_category", flat=True)
     all_risks_statuses = Risk.objects.values_list("risk_status", flat=True)
+    all_usernames = User.objects.values_list("username", flat=True)
 
     target_dates = all_mitigations.values_list("target_date", flat=True)
     current_date = date.today()
@@ -61,7 +80,15 @@ def page(request, page_name):
     for target_date in target_dates:
         if current_date > target_date:
             count += 1
-    all_auditlog = AuditLog.objects.all().order_by('-action_date')
+    all_auditlogs = AuditLog.objects.select_related("user").all().order_by('-action_date')
+    paginator = Paginator(all_auditlogs, 10)
+    page_number = request.GET.get("page", 1)
+    if page_number == "all":
+        page_obj = paginator.get_page(1)
+        paged_auditlogs = all_auditlogs
+    else:
+        page_obj = paginator.get_page(page_number)
+        paged_auditlogs = page_obj.object_list
     
     asset_owners = User.objects.filter(groups__name="Asset_Owner").values_list('username', flat=True)
     asset_owner_list = list(asset_owners)
@@ -82,7 +109,7 @@ def page(request, page_name):
         "is_auditor": user.groups.filter(name="Auditor").exists() if user.is_authenticated else False,
         "is_viewer": user.groups.filter(name="viewer").exists() if user.is_authenticated else False,
         "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
-        "risks": all_risks,
+        "risks": recent_risks,
         "assets": all_assets,
         "mitigations":all_mitigations,
         "owners": asset_owner_list,
@@ -94,9 +121,58 @@ def page(request, page_name):
         "overdue_mitigations_count": overdue_mitigations_count,
         "report_data":report_data,
         "total_completed_mitigations":total_completed_mitigations,
-        'all_auditlogs': all_auditlog,
-        'all_users': all_users,
+        "all_auditlogs": paged_auditlogs,
+        "all_users": all_users,
+        "all_usernames": all_usernames,
+        "page_obj": page_obj,
+        "paginator": paginator,
+        "page_range": paginator.get_elided_page_range(number=page_obj.number),
     }
+
+    if page_name == 'reports':
+        default_date_from, default_date_to = get_report_date_defaults()
+        report_rows = [
+            {
+                "category": mitigation.risk.asset.asset_category,
+                "asset": mitigation.risk.asset.asset_name,
+                "risk_id": mitigation.risk.risk_id,
+                "rating": mitigation.risk.risk_rating,
+                "status": mitigation.risk.risk_status,
+                "target_date": mitigation.target_date,
+            }
+            for mitigation in all_mitigations.select_related("risk", "risk__asset")
+        ]
+        paginator = Paginator(report_rows, 10)
+        page_number = request.GET.get("page", 1)
+        if page_number == "all":
+            page_obj = paginator.get_page(1)
+            paged_report_data = report_rows
+        else:
+            page_obj = paginator.get_page(page_number)
+            paged_report_data = list(page_obj.object_list)
+
+        context.update({
+            "selected_date_from": default_date_from,
+            "selected_date_to": default_date_to,
+            "report_data": paged_report_data,
+            "page_obj": page_obj,
+            "paginator": paginator,
+            "page_range": paginator.get_elided_page_range(number=page_obj.number),
+        })
+
+    if page_name == 'audit_logs':
+        default_date_from = AuditLog.objects.order_by('action_date').values_list('action_date', flat=True).first()
+        if default_date_from:
+            default_date_from = default_date_from.date().strftime('%Y-%m-%d')
+        else:
+            default_date_from = date.today().strftime('%Y-%m-%d')
+
+        default_date_to = date.today().strftime('%Y-%m-%d')
+        context.update({
+            "selected_date_from": default_date_from,
+            "selected_date_to": default_date_to,
+        })
+
     return render(request, template, context)
 
 #Add Asset
@@ -236,6 +312,18 @@ def audit_log_filter(request):
     all_auditlogs = AuditLog.objects.select_related("user").all().order_by('-action_date')
     earliest_date = all_auditlogs.aggregate(Min('action_date'))['action_date__min']
 
+    if earliest_date:
+        earliest_date = earliest_date.date().strftime('%Y-%m-%d')
+    else:
+        earliest_date = current_date.strftime('%Y-%m-%d')
+
+    if date_from or date_to:
+        date_from = date_from or earliest_date
+        date_to = date_to or current_date.strftime('%Y-%m-%d')
+    else:
+        date_from = earliest_date
+        date_to = current_date.strftime('%Y-%m-%d')
+
     # 3. Apply the Date Filters
     if date_from:
         # Converts the DateTime in the DB to a Date for accurate comparison
@@ -251,6 +339,15 @@ def audit_log_filter(request):
     if user_id:
         all_auditlogs = all_auditlogs.filter(user_id=user_id)
 
+    paginator = Paginator(all_auditlogs, 10)
+    page_number = request.GET.get("page", 1)
+    if page_number == "all":
+        page_obj = paginator.get_page(1)
+        paged_auditlogs = all_auditlogs
+    else:
+        page_obj = paginator.get_page(page_number)
+        paged_auditlogs = page_obj.object_list
+
     user = request.user
     all_users = User.objects.all()
 
@@ -261,7 +358,7 @@ def audit_log_filter(request):
         "is_viewer": user.groups.filter(name="viewer").exists() if user.is_authenticated else False,
         "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
         "assets": all_assets,
-        "all_auditlogs": all_auditlogs,
+        "all_auditlogs": paged_auditlogs,
         "all_users": all_users,
         "selected_user_id": user_id or "",
         "selected_action_type": action_type or "",
@@ -269,6 +366,9 @@ def audit_log_filter(request):
         "selected_date_to": date_to or "",
         "current_date": current_date,
         "earliest_date": earliest_date,
+        "page_obj": page_obj,
+        "paginator": paginator,
+        "page_range": paginator.get_elided_page_range(number=page_obj.number),
     }
     
     print("TOTAL ASSETS:", all_assets.count())
@@ -560,10 +660,14 @@ def view_risk(request, risk_id):
             count += 1
     
     selected_risk = get_object_or_404(Risk, risk_id=risk_id)
+    annex_controls = []
+    if selected_risk.annex_control:
+        annex_controls = [item.strip() for item in str(selected_risk.annex_control).splitlines() if item.strip()]
     
     user = request.user
     context = {
         "selected_risk": selected_risk,
+        "annex_controls": annex_controls,
         "is_admin": user.groups.filter(name="Admin").exists() if user.is_authenticated else False,
         "is_risk_manager": user.groups.filter(name="Risk_Manager").exists() if user.is_authenticated else False,
         "is_auditor": user.groups.filter(name="Auditor").exists() if user.is_authenticated else False,
@@ -802,15 +906,25 @@ def edit_risk_mitigation(request):
 @login_required
 def report_filter(request):
     all_mitigations = Mitigation.objects.select_related("risk", "risk__asset").all()
+    default_date_from, default_date_to = get_report_date_defaults()
     date_from = request.GET.get("date_from")
     date_to = request.GET.get("date_to")
+    submitted_date_filter = bool(date_from or date_to or request.GET.get("generate") == "1")
+
+    if submitted_date_filter:
+        date_from = date_from or default_date_from
+        date_to = date_to or default_date_to
+    else:
+        date_from = default_date_from
+        date_to = default_date_to
+
     category = request.GET.get("category")
     risk_status = request.GET.get("risk_status")
 
-    if date_from:
+    if submitted_date_filter and date_from:
         all_mitigations = all_mitigations.filter(target_date__gte=date_from)
 
-    if date_to:
+    if submitted_date_filter and date_to:
         all_mitigations = all_mitigations.filter(target_date__lte=date_to)
 
     if category:
@@ -819,7 +933,7 @@ def report_filter(request):
     if risk_status:
         all_mitigations = all_mitigations.filter(risk__risk_status=risk_status)
 
-    report_data = [
+    report_rows = [
         {
             "category": mitigation.risk.asset.asset_category,
             "asset": mitigation.risk.asset.asset_name,
@@ -830,6 +944,15 @@ def report_filter(request):
         }
         for mitigation in all_mitigations
     ]
+
+    paginator = Paginator(report_rows, 10)
+    page_number = request.GET.get("page", 1)
+    if page_number == "all":
+        page_obj = paginator.get_page(1)
+        report_data = report_rows
+    else:
+        page_obj = paginator.get_page(page_number)
+        report_data = list(page_obj.object_list)
 
     current_date = date.today()
     overdue_mitigations_count = sum(1 for item in report_data if item["target_date"] < current_date and item["status"] != "CLOSED")
@@ -861,6 +984,9 @@ def report_filter(request):
         "selected_date_to": date_to or "",
         "selected_category": category or "",
         "selected_risk_status": risk_status or "",
+        "page_obj": page_obj,
+        "paginator": paginator,
+        "page_range": paginator.get_elided_page_range(number=page_obj.number),
     }
 
     return render(request, ALLOWED_PAGES['reports'], context)
@@ -868,15 +994,25 @@ def report_filter(request):
 
 @login_required
 def report_export(request, file_format):
+    default_date_from, default_date_to = get_report_date_defaults()
     date_from = request.GET.get("date_from")
     date_to = request.GET.get("date_to")
+    submitted_date_filter = bool(date_from or date_to)
+
+    if submitted_date_filter:
+        date_from = date_from or default_date_from
+        date_to = date_to or default_date_to
+    else:
+        date_from = default_date_from
+        date_to = default_date_to
+
     category = request.GET.get("category")
     risk_status = request.GET.get("risk_status")
 
     all_mitigations = Mitigation.objects.select_related("risk", "risk__asset").all()
-    if date_from:
+    if submitted_date_filter and date_from:
         all_mitigations = all_mitigations.filter(target_date__gte=date_from)
-    if date_to:
+    if submitted_date_filter and date_to:
         all_mitigations = all_mitigations.filter(target_date__lte=date_to)
     if category:
         all_mitigations = all_mitigations.filter(risk__asset__asset_category=category)

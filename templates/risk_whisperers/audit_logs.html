@@ -148,6 +148,34 @@
                             </tbody>
                         </table>
                     </div>
+                    <!-- Pagination controls -->
+                    {% if page_obj.paginator.num_pages > 1 %}
+                    <div class="card-footer d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <div class="text-muted small">
+                            Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }} rows
+                        </div>
+                        <div class="btn-group" role="group" aria-label="Audit log pagination">
+                            {% if page_obj.has_previous %}
+                                <a class="btn btn-outline-secondary btn-sm" href="{% url 'audit_log_filter' %}?page={{ page_obj.previous_page_number }}&user_id={{ selected_user_id }}&action_type={{ selected_action_type }}&date_from={{ selected_date_from }}&date_to={{ selected_date_to }}">Previous 10</a>
+                            {% endif %}
+
+                            {% for page_num in page_range %}
+                                {% if page_num == page_obj.paginator.ELLIPSIS %}
+                                    <span class="btn btn-outline-secondary btn-sm disabled">...</span>
+                                {% elif page_num == page_obj.number %}
+                                    <span class="btn btn-primary btn-sm active">{{ page_num }}</span>
+                                {% else %}
+                                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'audit_log_filter' %}?page={{ page_num }}&user_id={{ selected_user_id }}&action_type={{ selected_action_type }}&date_from={{ selected_date_from }}&date_to={{ selected_date_to }}">{{ page_num }}</a>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <a class="btn btn-outline-secondary btn-sm" href="{% url 'audit_log_filter' %}?page={{ page_obj.next_page_number }}&user_id={{ selected_user_id }}&action_type={{ selected_action_type }}&date_from={{ selected_date_from }}&date_to={{ selected_date_to }}">Next 10</a>
+                            {% endif %}
+                        </div>
+                        <a class="btn btn-outline-primary btn-sm" href="{% url 'audit_log_filter' %}?page=all&user_id={{ selected_user_id }}&action_type={{ selected_action_type }}&date_from={{ selected_date_from }}&date_to={{ selected_date_to }}">Show All</a>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
             {% elif is_risk_manager %}
@@ -218,6 +246,34 @@
                             </tbody>
                         </table>
                     </div>
+
+                    {% if page_obj.paginator.num_pages > 1 %}
+                    <div class="card-footer d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <div class="text-muted small">
+                            Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }} rows
+                        </div>
+                        <div class="btn-group" role="group" aria-label="Audit log pagination">
+                            {% if page_obj.has_previous %}
+                                <a class="btn btn-outline-secondary btn-sm" href="{% url 'audit_log_filter' %}?page={{ page_obj.previous_page_number }}&user_id={{ selected_user_id }}&action_type={{ selected_action_type }}&date_from={{ selected_date_from }}&date_to={{ selected_date_to }}">Previous 10</a>
+                            {% endif %}
+
+                            {% for page_num in page_range %}
+                                {% if page_num == page_obj.paginator.ELLIPSIS %}
+                                    <span class="btn btn-outline-secondary btn-sm disabled">...</span>
+                                {% elif page_num == page_obj.number %}
+                                    <span class="btn btn-primary btn-sm active">{{ page_num }}</span>
+                                {% else %}
+                                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'audit_log_filter' %}?page={{ page_num }}&user_id={{ selected_user_id }}&action_type={{ selected_action_type }}&date_from={{ selected_date_from }}&date_to={{ selected_date_to }}">{{ page_num }}</a>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <a class="btn btn-outline-secondary btn-sm" href="{% url 'audit_log_filter' %}?page={{ page_obj.next_page_number }}&user_id={{ selected_user_id }}&action_type={{ selected_action_type }}&date_from={{ selected_date_from }}&date_to={{ selected_date_to }}">Next 10</a>
+                            {% endif %}
+                        </div>
+                        <a class="btn btn-outline-primary btn-sm" href="{% url 'audit_log_filter' %}?page=all&user_id={{ selected_user_id }}&action_type={{ selected_action_type }}&date_from={{ selected_date_from }}&date_to={{ selected_date_to }}">Show All</a>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
             {% elif is_viewer %}

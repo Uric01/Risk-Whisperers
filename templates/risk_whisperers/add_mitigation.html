@@ -112,8 +112,8 @@
                                             <label class="form-label fw-bold">Assigned To *</label>
                                             <select name="assigned_to" class="form-select" required>
                                                 <option value="" selected>Select asset owner..</option>
-                                                {% for owner in owners %}
-                                                    <option value="{{ owner }}">{{ owner }}</option>
+                                                {% for all_username in all_usernames %}
+                                                    <option value="{{ all_username }}">{{ all_username }}</option>
                                                 {% endfor %}
                                             </select>
                                         </div>
