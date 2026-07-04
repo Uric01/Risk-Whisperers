@@ -20,6 +20,7 @@
 <body>
 <div class="login-container">
     <div class="login-card">
+        
         <div class="text-center mb-4">
             <i class="bi bi-shield-check text-primary" style="font-size:3rem;"></i>
             <h3 class="mt-2 fw-bold">Risk Management Portal</h3>
@@ -27,15 +28,16 @@
             <p class="text-muted small">Enter your credentials to access</p>
         </div>
 
-        {# Example Flask-style flash block removed from this template because Django does not support it here. #}
-
-        <div class="alert alert-danger d-none" id="demo-error">
-            <!-- PYTHON: Example error placeholder — remove in production template -->
-            Invalid username or password.
-        </div>
-
         <form method="post" action="{% url 'login' %}">
             {% csrf_token %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
             <div class="mb-3">
                 {# PYTHON: value="request.form.username or ''" to repopulate on error #}
                 <input name="username" class="form-control form-control-lg" placeholder="Username">

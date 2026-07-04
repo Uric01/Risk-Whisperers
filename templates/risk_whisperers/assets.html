@@ -76,9 +76,10 @@
     </div>
 </nav>
 <div class="container mt-4">
+    
 
 <div class="page-header d-flex justify-content-between align-items-center">
-
+    
     {% if user.is_authenticated %}
                         {% if is_admin %}
                         <div>
@@ -110,14 +111,28 @@
                 {% endif %}
 </div>
 
+
+{% if messages %}
+        <div class="container mt-3">
+        {% for message in messages %}
+
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
 <form class="card card-body mb-4" method="get" action="{% url 'assets_filter' %}">
+     {% csrf_token %}
     <div class="row g-3">
         <div class="col-md-5">
             <input name="q" class="form-control" placeholder="Search Asset" value="{{ request.GET.q }}">
         </div>
         <div class="col-md-3">
             <select name="category" class="form-select">
-                 <option value="">All Categories</option>
+                <option value="">All Categories</option>
                 <option value="IT"  {% if request.GET.category == "IT" %}selected{% endif %}>IT</option>
                 <option value="OT"  {% if request.GET.category == "OT" %}selected{% endif %}>OT</option>
                 <option value="INFRASTRUCTURE" {% if request.GET.category == "INFRASTRUCTURE" %}selected{% endif %}>Infrastructure</option>
@@ -201,6 +216,34 @@
         </table>
     </div>
 </div>
+
+{% if page_obj.paginator.num_pages > 1 %}
+<div class="card-footer d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <div class="text-muted small">
+        Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }} rows
+    </div>
+    <div class="btn-group" role="group" aria-label="Asset pagination">
+        {% if page_obj.has_previous %}
+            <a class="btn btn-outline-secondary btn-sm" href="{% url 'assets_filter' %}?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}&category={{ request.GET.category }}&status={{ request.GET.status }}">Previous 10</a>
+        {% endif %}
+
+        {% for page_num in page_range %}
+            {% if page_num == page_obj.paginator.ELLIPSIS %}
+                <span class="btn btn-outline-secondary btn-sm disabled">...</span>
+            {% elif page_num == page_obj.number %}
+                <span class="btn btn-primary btn-sm active">{{ page_num }}</span>
+            {% else %}
+                <a class="btn btn-outline-secondary btn-sm" href="{% url 'assets_filter' %}?page={{ page_num }}&q={{ request.GET.q }}&category={{ request.GET.category }}&status={{ request.GET.status }}">{{ page_num }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <a class="btn btn-outline-secondary btn-sm" href="{% url 'assets_filter' %}?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}&category={{ request.GET.category }}&status={{ request.GET.status }}">Next 10</a>
+        {% endif %}
+    </div>
+    <a class="btn btn-outline-primary btn-sm" href="{% url 'assets_filter' %}?page=all&q={{ request.GET.q }}&category={{ request.GET.category }}&status={{ request.GET.status }}">Show All</a>
+</div>
+{% endif %}
 
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

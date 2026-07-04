@@ -84,7 +84,17 @@
     </div>
     <a href="{%url 'page' 'add_risk'%}" class="btn btn-danger">Add Risk</a>
 </div>
+{% if messages %}
+        <div class="container mt-3">
+        {% for message in messages %}
 
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 <form class="card card-body mb-4" method="get" action="{% url 'risk_filter' %}" >
     <div class="row g-3">
         <div class="col-md-4">
@@ -125,8 +135,8 @@
             <tbody>
                 
                 {%for risk in risks%}
-                    {%for asset in assets%}
-                        {%if asset.asset == risk.asset_id%}
+                
+                        
                             <tr>
                                 <td name=>RSK-{{risk.risk_id}}</td>
                                 <td>{{asset.asset_name}}</td>
@@ -140,15 +150,54 @@
                                     <a class="btn btn-sm btn-outline-success" href="{% url 'view_risk_add_mitigation' risk.risk_id %}">Add Mitigation</a>
                                 </td>                
                             </tr>
-                        {% endif %}
-                    {% endfor %}
+                        
+                
            
                 {% endfor %}
               
             </tbody>
         </table>
     </div>
+</br>
 </div>
+
+
+
+
+
+{% if page_obj.paginator.num_pages > 1 %}
+<div class="card-footer d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <div class="text-muted small">
+        Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }} rows
+    </div>
+    <div class="btn-group" role="group" aria-label="Asset pagination">
+        {% if page_obj.has_previous %}
+            <a class="btn btn-outline-secondary btn-sm" href="{% url 'risk_filter' %}?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}&category={{ request.GET.category }}&status={{ request.GET.status }}">Previous 10</a>
+        {% endif %}
+
+        {% for page_num in page_range %}
+            {% if page_num == page_obj.paginator.ELLIPSIS %}
+                <span class="btn btn-outline-secondary btn-sm disabled">...</span>
+            {% elif page_num == page_obj.number %}
+                <span class="btn btn-primary btn-sm active">{{ page_num }}</span>
+            {% else %}
+                <a class="btn btn-outline-secondary btn-sm" href="{% url 'risk_filter' %}?page={{ page_num }}&q={{ request.GET.q }}&category={{ request.GET.category }}&status={{ request.GET.status }}">{{ page_num }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            
+            <a class="btn btn-outline-secondary btn-sm" href="{% url 'risk_filter' %}?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}&category={{ request.GET.category }}&status={{ request.GET.status }}">Next 10</a>
+        {% endif %}
+    </div>
+    <a class="btn btn-outline-primary btn-sm" href="{% url 'risk_filter' %}?page=all&q={{ request.GET.q }}&category={{ request.GET.category }}&status={{ request.GET.status }}">Show All</a>
+</div>
+{% endif %}
+
+
+
+
+
 
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

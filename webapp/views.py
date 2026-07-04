@@ -8,6 +8,7 @@ from datetime import date, datetime
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q, Min
+from django.contrib import messages
 
 
 
@@ -83,6 +84,7 @@ def page(request, page_name):
     all_auditlogs = AuditLog.objects.select_related("user").all().order_by('-action_date')
     paginator = Paginator(all_auditlogs, 10)
     page_number = request.GET.get("page", 1)
+    
     if page_number == "all":
         page_obj = paginator.get_page(1)
         paged_auditlogs = all_auditlogs
@@ -103,7 +105,41 @@ def page(request, page_name):
         raise Http404('Page not found')
     user = request.user
     all_users = User.objects.all()
-    context = {
+
+    if page_name == 'assets':
+        paginator = Paginator(all_assets, 10)
+        page_number = request.GET.get("page", 1)
+        if page_number == "all":
+            page_obj = paginator.get_page(1)
+            paged_assets = all_assets
+        else:
+            page_obj = paginator.get_page(page_number)
+            paged_assets = page_obj.object_list
+        context = {
+            "is_admin": user.groups.filter(name="Admin").exists() if user.is_authenticated else False,
+            "is_risk_manager": user.groups.filter(name="Risk_Manager").exists() if user.is_authenticated else False,
+            "is_auditor": user.groups.filter(name="Auditor").exists() if user.is_authenticated else False,
+            "is_viewer": user.groups.filter(name="viewer").exists() if user.is_authenticated else False,
+            "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
+            "risks": recent_risks,
+            "assets": paged_assets,
+            "mitigations":all_mitigations,
+            "owners": asset_owner_list,
+            "asset_categories":all_asset_categories,
+            "all_risks_statuses":all_risks_statuses,
+            "total_assets":total_assets,
+            "total_risks": total_risks,
+            "total_open_risks": total_open_risks,
+            "total_completed_mitigations": total_completed_mitigations,
+            "overdue_mitigations_count": overdue_mitigations_count,
+            "all_users": all_users,
+            "all_auditlogs": paged_auditlogs,
+            "page_obj": page_obj,
+            "paginator": paginator,
+            "page_range": paginator.get_elided_page_range(number=page_obj.number),
+        }
+    else:
+        context = {
         "is_admin": user.groups.filter(name="Admin").exists() if user.is_authenticated else False,
         "is_risk_manager": user.groups.filter(name="Risk_Manager").exists() if user.is_authenticated else False,
         "is_auditor": user.groups.filter(name="Auditor").exists() if user.is_authenticated else False,
@@ -128,6 +164,69 @@ def page(request, page_name):
         "paginator": paginator,
         "page_range": paginator.get_elided_page_range(number=page_obj.number),
     }
+        
+        
+        
+    if page_name == 'risks':
+        paginator = Paginator(all_risks, 10)
+        page_number = request.GET.get("page", 1)
+        if page_number == "all":
+            page_obj = paginator.get_page(1)
+            paged_risks = all_assets
+        else:
+            page_obj = paginator.get_page(page_number)
+            paged_risks = page_obj.object_list
+        context = {
+            "is_admin": user.groups.filter(name="Admin").exists() if user.is_authenticated else False,
+            "is_risk_manager": user.groups.filter(name="Risk_Manager").exists() if user.is_authenticated else False,
+            "is_auditor": user.groups.filter(name="Auditor").exists() if user.is_authenticated else False,
+            "is_viewer": user.groups.filter(name="viewer").exists() if user.is_authenticated else False,
+            "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
+            "risks": paged_risks,
+            "assets": all_assets,
+            "mitigations":all_mitigations,
+            "owners": asset_owner_list,
+            "asset_categories":all_asset_categories,
+            "all_risks_statuses":all_risks_statuses,
+            "total_assets":total_assets,
+            "total_risks": total_risks,
+            "total_open_risks": total_open_risks,
+            "total_completed_mitigations": total_completed_mitigations,
+            "overdue_mitigations_count": overdue_mitigations_count,
+            "all_users": all_users,
+            "all_auditlogs": paged_auditlogs,
+            "page_obj": page_obj,
+            "paginator": paginator,
+            "page_range": paginator.get_elided_page_range(number=page_obj.number),
+        }
+    else:
+        context = {
+        "is_admin": user.groups.filter(name="Admin").exists() if user.is_authenticated else False,
+        "is_risk_manager": user.groups.filter(name="Risk_Manager").exists() if user.is_authenticated else False,
+        "is_auditor": user.groups.filter(name="Auditor").exists() if user.is_authenticated else False,
+        "is_viewer": user.groups.filter(name="viewer").exists() if user.is_authenticated else False,
+        "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
+        "risks": recent_risks,
+        "assets": all_assets,
+        "mitigations":all_mitigations,
+        "owners": asset_owner_list,
+        "asset_categories":all_asset_categories,
+        "all_risks_statuses":all_risks_statuses,
+        "total_assets":total_assets,
+        "total_risks": total_risks,
+        "total_open_risks": total_open_risks,
+        "overdue_mitigations_count": overdue_mitigations_count,
+        "report_data":report_data,
+        "total_completed_mitigations":total_completed_mitigations,
+        "all_auditlogs": paged_auditlogs,
+        "all_users": all_users,
+        "all_usernames": all_usernames,
+        "page_obj": page_obj,
+        "paginator": paginator,
+        "page_range": paginator.get_elided_page_range(number=page_obj.number),
+    }
+        
+        
 
     if page_name == 'reports':
         default_date_from, default_date_to = get_report_date_defaults()
@@ -192,7 +291,7 @@ def add_asset(request):
         new_asset = Asset.objects.create(
             asset_name=request.POST.get("asset_name"),
             asset_description=request.POST.get("asset_description"),
-            asset_owner=request.POST.get("asset_owner"),
+            asset_owner=request.POST.get("owner"),
             location=request.POST.get("asset_location"),
             asset_criticality=request.POST.get("asset_criticality"),
             cia_confidentiality=request.POST.get("confidentiality_impact"),
@@ -200,8 +299,7 @@ def add_asset(request):
             cia_availability=request.POST.get("availability_impact"),
             asset_category=request.POST.get("asset_category"),
             operational_status=request.POST.get("operational_status"),
-            classification=request.POST.get("classification"),
-            
+            classification=request.POST.get("classification"), 
         )
          # Log the generation
         log_event(
@@ -221,9 +319,9 @@ def add_asset(request):
         "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
         "assets":all_assets,
     }
+        messages.success(request, f"Asset added successfully!")
         return render(request,ALLOWED_PAGES['assets'],context)
     
-    # FIXED: Render the page directly for GET requests instead of redirecting
     user = request.user
     context = {
         "is_admin": user.groups.filter(name="Admin").exists() if user.is_authenticated else False,
@@ -275,6 +373,15 @@ def assets_filter(request):
     if q and status:
         all_assets = all_assets.filter(operational_status=status).filter(asset_name__icontains=q)
 
+    paginator = Paginator(all_assets, 10)
+    page_number = request.GET.get("page", 1)
+    if page_number == "all":
+        page_obj = paginator.get_page(1)
+        paged_assets = all_assets
+    else:
+        page_obj = paginator.get_page(page_number)
+        paged_assets = page_obj.object_list
+
     user = request.user
     
     context = {
@@ -283,7 +390,10 @@ def assets_filter(request):
         "is_auditor": user.groups.filter(name="Auditor").exists() if user.is_authenticated else False,
         "is_viewer": user.groups.filter(name="viewer").exists() if user.is_authenticated else False,
         "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
-        "assets": all_assets # FIXED: Changed from "asset_filter"
+        "assets": paged_assets,
+        "page_obj": page_obj,
+        "paginator": paginator,
+        "page_range": paginator.get_elided_page_range(number=page_obj.number),
     }
     
     print("TOTAL ASSETS:", all_assets.count())
@@ -445,6 +555,7 @@ def edit_asset(request, asset_id):
     )
         
         # Redirect back to the view page to see the updates
+        messages.success(request, f"Asset updated successfully!")
         return redirect('view_asset', asset_id=selected_asset.asset)
 
     # For a GET request, pass the asset and permissions to the template
@@ -485,6 +596,7 @@ def add_asset_risk(request, asset_id):
         "is_viewer": user.groups.filter(name="viewer").exists() if user.is_authenticated else False,
         "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
     }
+    messages.info(request, f"Adding a new risk for asset: {selected_asset.asset_name}")
     return render(request, ALLOWED_PAGES['add_risk'], context)
 
 @login_required
@@ -524,7 +636,9 @@ def add_risk(request):
             new_risk.risk_id, 
             f"Created new risk: {new_risk.risk_description}"
             )
-        print(f"Asset saved with ID: {new_risk.asset}")
+
+        messages.success(request, f"Risk added successfully!")
+            
         return redirect('page', page_name='risks')
 
     user = request.user
@@ -576,6 +690,7 @@ def edit_risk(request, risk_id):
             f"Updated Risk ID {selected_risk.risk_id} (Rating: {selected_risk.risk_rating})"
         )
         
+        messages.success(request, f"Risk updated successfully!")
         # Redirect back to the risk page to see the updates
         return redirect('view_risk', risk_id=selected_risk.risk_id)
 
@@ -798,6 +913,7 @@ def add_mitigation(request):
         "assets": all_assets,
         "mitigations": all_mitigations,
     }
+        messages.success(request, f"Mitigation added successfully!")
         return render(request, ALLOWED_PAGES['mitigations'], context )
 
     user = request.user
@@ -886,6 +1002,7 @@ def edit_risk_mitigation(request):
             mitigation.mitigation_id,
             f"Modified mitigation for Risk ID {mitigation.risk.risk_id}. Status set to: {mitigation.progress_status}"
         )
+            messages.success(request, f"Mitigation updated successfully!")
             return redirect('page', page_name='mitigations')
 
     # 3. For a GET request, pass the mitigation object to the template context
@@ -964,7 +1081,7 @@ def report_filter(request):
 
     total_assets = all_assets.count()
     total_risks = all_risks.count()
-    total_open_risks = all_risks.filter(risk_status="OPEN").count()
+    total_open_risks = all_risks.filter(risk_status="Open").count()
 
     user = request.user
     context = {

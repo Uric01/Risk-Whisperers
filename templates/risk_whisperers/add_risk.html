@@ -119,7 +119,7 @@
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Likelihood *</label>
                             <select name="likelihood" id="likelihood" class="form-select" required>
-                                <option value="0" selected>Select...</option>
+                                <option value="" selected>Select...</option>
                                 <option value="1" >1</option>
                                 <option value="2" >2</option>
                                 <option value="3" >3</option>
@@ -130,7 +130,7 @@
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Impact *</label>
                             <select name="impact" id="impact" class="form-select" required>
-                                <option value="0" selected>Select...</option>
+                                <option value="" selected>Select...</option>
                                 <option value="1" >1</option>
                                 <option value="2" >2</option>
                                 <option value="3" >3</option>
@@ -141,11 +141,11 @@
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Risk Rating</label>
                            
-                            <input name = "risk_rating"type="text" id="risk_rating_display" class="form-control fw-bold text-danger" readonly value="High (15)">
+                            <input name="risk_rating" type="text" id="risk_rating_display" class="form-control fw-bold text-danger" readonly value="High (15)">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Status</label>
-                            <select name="risk_status" class="form-select">
+                            <select name="risk_status" class="form-select" required>
                               
                                 <option value="">Select...</option>
                                 <option value="OPEN">Open</option>
@@ -167,7 +167,7 @@
                         </div>
                         <div class="col-md-4 mb-3">
                              <label class="form-label fw-bold">Owner *</label>
-                            <select name="owner" class="form-select" required>
+                            <select name="risk_owner" class="form-select" required>
                                 <!-- PYTHON: loop owners from DB -->
                                  <option value="">Select Risk owner...</option>
                                  {% for risk in risks %}
@@ -178,12 +178,12 @@
                     
                         <div class="col-md-4 mb-3">
                             <label class="form-label fw-bold">Review Date</label>
-                            <input type="date" name="review_date" class="form-control">
+                            <input type="date" name="review_date" class="form-control" required>
                         </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Annex Controls</label>
-                        <select name="control" class="form-select" multiple>
+                        <select name="control" class="form-select" multiple required>
                             <option value="A.5.1 Policies for information security">A.5.1 Policies for information security</option>
                         </select>
                     </div>

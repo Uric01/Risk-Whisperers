@@ -170,6 +170,32 @@ class ReportFilterTests(TestCase):
         self.assertTrue(response.context['page_obj'].has_next())
         self.assertFalse(response.context['page_obj'].has_previous())
 
+    def test_assets_page_paginates_results_to_ten_rows(self):
+        self.client.force_login(self.user)
+
+        for index in range(11):
+            Asset.objects.create(
+                asset_name=f'Asset {index}',
+                asset_description='Asset for pagination test',
+                asset_category='IT',
+                operational_status='ACTIVE',
+                classification='INTERNAL',
+                asset_criticality='HIGH',
+                cia_confidentiality='HIGH',
+                cia_integrity='HIGH',
+                cia_availability='HIGH',
+                asset_owner='Owner',
+                location='HQ',
+            )
+
+        response = self.client.get(reverse('page', kwargs={'page_name': 'assets'}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['assets']), 10)
+        self.assertEqual(response.context['page_obj'].number, 1)
+        self.assertTrue(response.context['page_obj'].has_next())
+        self.assertFalse(response.context['page_obj'].has_previous())
+
     def test_reports_page_paginates_results_to_ten_rows(self):
         self.client.force_login(self.user)
 
