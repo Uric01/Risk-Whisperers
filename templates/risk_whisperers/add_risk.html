@@ -144,7 +144,7 @@
                             <input name="risk_rating" type="text" id="risk_rating_display" class="form-control fw-bold text-danger" readonly value="High (15)">
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label fw-bold">Status</label>
+                            <label class="form-label fw-bold">Status *</label>
                             <select name="risk_status" class="form-select" required>
                               
                                 <option value="">Select...</option>
@@ -166,12 +166,13 @@
                             </select>
                         </div>
                         <div class="col-md-4 mb-3">
-                             <label class="form-label fw-bold">Owner *</label>
+                            <label class="form-label fw-bold">Owner *</label>
                             <select name="risk_owner" class="form-select" required>
                                 <!-- PYTHON: loop owners from DB -->
                                  <option value="">Select Risk owner...</option>
                                  {% for risk in risks %}
-                                    <Option value="{{ risk.risk_owner }}">{{ risk.risk_owner }}</option>
+                                    <!-- Owner will in future be represented by employee number instead of name-->
+                                    <Option value="{{ risk.risk_owner }}">ID - {{ risk.risk_id }}:  {{ risk.risk_owner }}</option>
                                  {% endfor %}
                             </select>
                         </div>
@@ -182,7 +183,7 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Annex Controls</label>
+                        <label class="form-label fw-bold">Annex Controls *</label>
                         <select name="control" class="form-select" multiple required>
                             <option value="A.5.1 Policies for information security">A.5.1 Policies for information security</option>
                         </select>
@@ -206,6 +207,8 @@
     const ratingDisplay = document.getElementById('risk_rating_display');
     function updateRating() {
         ratingDisplay.value = String(parseInt(likelihood.value, 10) * parseInt(impact.value, 10));
+        if (ratingDisplay.value == 'NaN')
+            ratingDisplay.value = 0;
     }
     likelihood.addEventListener('change', updateRating);
     impact.addEventListener('change', updateRating);

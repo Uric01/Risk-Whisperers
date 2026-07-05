@@ -71,8 +71,8 @@ def page(request, page_name):
     all_risks = Risk.objects.all()
     recent_risks = all_risks.order_by('-risk_rating', '-risk_id')[:5]
     all_mitigations = Mitigation.objects.all()
-    all_asset_categories = Asset.objects.values_list("asset_category", flat=True)
-    all_risks_statuses = Risk.objects.values_list("risk_status", flat=True)
+    all_asset_categories = Asset.objects.values_list("asset_category", flat=True).distinct().order_by("asset_category")
+    all_risks_statuses = Risk.objects.values_list("risk_status", flat=True).distinct().order_by("risk_status")
     all_usernames = User.objects.values_list("username", flat=True)
 
     target_dates = all_mitigations.values_list("target_date", flat=True)
@@ -172,7 +172,7 @@ def page(request, page_name):
         page_number = request.GET.get("page", 1)
         if page_number == "all":
             page_obj = paginator.get_page(1)
-            paged_risks = all_assets
+            paged_risks = all_risks
         else:
             page_obj = paginator.get_page(page_number)
             paged_risks = page_obj.object_list
@@ -734,7 +734,10 @@ def risk_filter(request):
         Q(asset__asset_name__icontains=q))
 
     if asset_name_:
+        
+        all_risks = all_risks.filter(asset__asset_name=asset_name_)
         all_assets = all_assets.filter(asset_name=asset_name_)
+        
 
     if risk_status:
         all_risks = all_risks.filter(risk_status=risk_status)
@@ -742,7 +745,17 @@ def risk_filter(request):
     if q and risk_status:
         all_risks = all_risks.filter(risk_description__icontains=q).filter(risk_status=risk_status)
         
+    # --- PAGINATION (ADD THIS) ---
+    paginator = Paginator(all_risks, 10)
+    page_number = request.GET.get("page", 1)
+    if page_number == "all":
+        page_obj = paginator.get_page(1)
+        paged_risks = all_risks
+    else:
+        page_obj = paginator.get_page(page_number)
+        paged_risks = page_obj.object_list
 
+    
     user = request.user
     
     context = {
@@ -751,11 +764,14 @@ def risk_filter(request):
         "is_auditor": user.groups.filter(name="Auditor").exists() if user.is_authenticated else False,
         "is_viewer": user.groups.filter(name="viewer").exists() if user.is_authenticated else False,
         "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
-        "assets": all_assets, # FIXED: Changed from "asset_filter"
+        "assets": all_assets,
         "risks" : all_risks,
+         "assets": all_assets,          # for the filter dropdown
+        "risks": paged_risks,          # use the paginated queryset
+        "page_obj": page_obj,
+        "paginator": paginator,
+        "page_range": paginator.get_elided_page_range(number=page_obj.number),
     }
-    
-    print("TOTAL ASSETS:", all_assets.count())
 
     return render(request, ALLOWED_PAGES['risks'], context)
 
@@ -942,6 +958,17 @@ def view_mitigations(request):
         if current_date > target_date:
             count += 1
     
+    paginator = Paginator(all_mitigations, 10)  # 10 per page
+    page_number = request.GET.get('page', 1)
+
+    if page_number == "all":
+        page_obj = paginator.get_page(1)
+        paged_mitigations = all_mitigations
+    else:
+        page_obj = paginator.get_page(page_number)
+        paged_mitigations = page_obj.object_list
+    
+    
     user = request.user
     
     context = {
@@ -952,6 +979,10 @@ def view_mitigations(request):
         "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
         "assets": all_assets,
         "mitigations": all_mitigations,
+        "mitigations": paged_mitigations,
+        "page_obj": page_obj,
+        "paginator": paginator,
+        "page_range": paginator.get_elided_page_range(number=page_obj.number),
     }
     return render(request, ALLOWED_PAGES['mitigations'], context)
 
@@ -1076,8 +1107,8 @@ def report_filter(request):
 
     all_assets = Asset.objects.all()
     all_risks = Risk.objects.all()
-    all_risks_statuses = Risk.objects.values_list("risk_status", flat=True)
-    asset_categories = Asset.objects.values_list("asset_category", flat=True)
+    all_risks_statuses = Risk.objects.values_list("risk_status", flat=True).distinct().order_by("risk_status")
+    asset_categories = Asset.objects.values_list("asset_category", flat=True).distinct().order_by("asset_category")
 
     total_assets = all_assets.count()
     total_risks = all_risks.count()

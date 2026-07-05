@@ -93,8 +93,8 @@
                         <input name="asset_name" class="form-control" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Description</label>
-                        <textarea name="asset_description" class="form-control"></textarea>
+                        <label class="form-label fw-bold">Asset Description *</label>
+                        <textarea name="asset_description" class="form-control" required></textarea>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -122,8 +122,8 @@
                     </div>
                     <div class="row bg-light rounded p-3 mb-4 mx-0 border">
                         <div class="col-md-4 mb-3">
-                            <label class="form-label fw-bold">Classification</label>
-                            <select name="classification" class="form-select">
+                            <label class="form-label fw-bold">Classification *</label>
+                            <select name="classification" class="form-select" required>
                                 <option value="">Select...</option>
                                 <option value="PUBLIC">Public</option>
                                 <option value="INTERNAL">Internal</option>
@@ -135,8 +135,8 @@
                         </div>
                     
                         <div class="col-md-4 mb-3">
-                            <label class="form-label fw-bold">Asset Criticality</label>
-                            <select name="asset_criticality" class="form-select">
+                            <label class="form-label fw-bold">Asset Criticality *</label>
+                            <select name="asset_criticality" class="form-select" required>
                                 <option value="">Select...</option>
                                 <option value="LOW">Low</option>
                                 <option value="MEDIUM">Medium</option>
@@ -146,7 +146,7 @@
                     
                         <div class="col-md-4 mb-3">
                             <label class="form-label fw-bold">
-                                CIA Triad Impact Rating
+                                CIA Triad Impact Rating *
                                 <button type="button" class="btn btn-link link-secondary p-0 border-0 align-baseline ms-1"
                                     data-bs-toggle="modal" data-bs-target="#ciaHelpModal" aria-label="Help">
                                     <i class="bi bi-question-circle"></i>
@@ -154,19 +154,19 @@
                             </label>
                     
                             <div class="d-flex gap-2">
-                                <select name="confidentiality_impact" class="form-select form-select-sm">
+                                <select name="confidentiality_impact" class="form-select form-select-sm" required>
                                     <option value="">C</option>
                                     <option value="LOW">Low</option>
                                     <option value="MEDIUM">Medium</option>
                                     <option value="HIGH">High</option>
                                 </select>
-                                <select name="integrity_impact" class="form-select form-select-sm">
+                                <select name="integrity_impact" class="form-select form-select-sm" required>
                                     <option value="">I</option>
                                     <option value="LOW">Low</option>
                                     <option value="MEDIUM">Medium</option>
                                     <option value="HIGH">High</option>
                                 </select>
-                                <select name="availability_impact" class="form-select form-select-sm">
+                                <select name="availability_impact" class="form-select form-select-sm" required>
                                     <option value="">A</option>
                                     <option value="LOW">Low</option>
                                     <option value="MEDIUM">Medium</option>
@@ -187,8 +187,14 @@
                             </select>
                         </div>
                         <div class="col-md-6 mb-4">
-                            <label class="form-label fw-bold">Location</label>
-                            <input name="asset_location" class="form-control">
+                            <label class="form-label fw-bold">Location *</label>
+                                <select name="asset_location" class="form-select" required>
+                                    <!-- PYTHON: loop location from DB -->
+                                    <option value="">Select Asset location...</option>
+                                    {% for asset in assets %}
+                                        <Option value="{{ asset.location }}">{{ asset.location }}</option>
+                                    {% endfor %}
+                                </select>
                         </div>
                     </div>
                     <div class="text-end">

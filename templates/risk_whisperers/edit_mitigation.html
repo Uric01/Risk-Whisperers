@@ -25,7 +25,6 @@
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle active" href="#" data-bs-toggle="dropdown">Mitigations</a>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="{% url 'page' 'edit_mitigation' %}"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
                                     <li><a class="dropdown-item" href="{% url 'page' 'add_mitigation' %}"><i class="bi bi-plus-circle me-2"></i>Add</a></li>
                                 </ul>
                             </li>
@@ -38,7 +37,6 @@
                                 <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle active" href="#" data-bs-toggle="dropdown">Mitigations</a>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="{% url 'page' 'edit_mitigation' %}"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
                                     <li><a class="dropdown-item" href="{% url 'page' 'add_mitigation' %}"><i class="bi bi-plus-circle me-2"></i>Add</a></li>
                                 </ul>
                             </li>
@@ -117,14 +115,14 @@
                                                 </select>
                                             </div>
                                             <div class="col-md-6 mb-3">
-                                                <label class="form-label fw-bold">Target Date</label>
-                                                <input name="target_date" type="date" class="form-control" value="{{ mitigation.target_date|date:'Y-m-d' }}">
+                                                <label class="form-label fw-bold">Target Date *</label>
+                                                <input name="target_date" type="date" class="form-control" value="{{ mitigation.target_date|date:'Y-m-d' }}" required>
                                             </div>
                                         </div>
                                         
                                         <div class="mb-3">
-                                            <label class="form-label fw-bold">Progress Status</label>
-                                            <select name="mitigation_status" class="form-select">
+                                            <label class="form-label fw-bold">Progress Status *</label>
+                                            <select name="mitigation_status" class="form-select" required>
                                                 <option value="Not Started">Not Started</option>
                                                 <option value="In Progress" >In Progress</option>
                                                 <option value="Completed" >Completed</option>
@@ -132,13 +130,13 @@
                                         </div>
                                         
                                         <div class="mb-3">
-                                            <label class="form-label fw-bold">Comments</label>
-                                            <textarea name="comments" class="form-control">{{ mitigation.comments }}</textarea>
+                                            <label class="form-label fw-bold">Comments *</label>
+                                            <textarea name="comments" class="form-control" required>{{ mitigation.comments }}</textarea>
                                         </div>
                                         
                                         <div class="mb-3">
-                                            <label class="form-label fw-bold">Effectiveness Review Date</label>
-                                            <input name="effectiveness_review_date" type="date" class="form-control" value="{{ mitigation.effectiveness_review_date|date:'Y-m-d' }}">
+                                            <label class="form-label fw-bold">Effectiveness Review Date *</label>
+                                            <input name="effectiveness_review_date" type="date" class="form-control" value="{{ mitigation.effectiveness_review_date|date:'Y-m-d' }}" required>
                                         </div>
                                         
                                         <div class="text-end">
@@ -190,14 +188,14 @@
                                                 </select>
                                             </div>
                                             <div class="col-md-6 mb-3">
-                                                <label class="form-label fw-bold">Target Date</label>
-                                                <input name="target_date" type="date" class="form-control" value="{{ mitigation.target_date|date:'Y-m-d' }}">
+                                                <label class="form-label fw-bold">Target Date *</label>
+                                                <input name="target_date" type="date" class="form-control" value="{{ mitigation.target_date|date:'Y-m-d' }}" required>
                                             </div>
                                         </div>
                                         
                                         <div class="mb-3">
-                                            <label class="form-label fw-bold">Progress Status</label>
-                                            <select name="mitigation_status_id" class="form-select">
+                                            <label class="form-label fw-bold">Progress Status *</label>
+                                            <select name="mitigation_status_id" class="form-select" required>
                                                 <option value="Not Started" {% if mitigation.status_id == 'Not Started' %}selected{% endif %}>Not Started</option>
                                                 <option value="In Progress" >In Progress</option>
                                                 <option value="Completed" >Completed</option>
@@ -205,13 +203,13 @@
                                         </div>
                                         
                                         <div class="mb-3">
-                                            <label class="form-label fw-bold">Comments</label>
-                                            <textarea name="comments" class="form-control">{{ mitigation.comments }}</textarea>
+                                            <label class="form-label fw-bold">Comments *</label>
+                                            <textarea name="comments" class="form-control" required>{{ mitigation.comments }}</textarea>
                                         </div>
                                         
                                         <div class="mb-3">
-                                            <label class="form-label fw-bold">Effectiveness Review Date</label>
-                                            <input name="effectiveness_review_date" type="date" class="form-control" value="{{ mitigation.effectiveness_review_date|date:'Y-m-d' }}">
+                                            <label class="form-label fw-bold">Effectiveness Review Date *</label>
+                                            <input name="effectiveness_review_date" type="date" class="form-control" value="{{ mitigation.effectiveness_review_date|date:'Y-m-d' }}" required>
                                         </div>
                                         
                                         <div class="text-end">
@@ -258,8 +256,8 @@
                                             </select>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label fw-bold">Target Date</label>
-                                            <input name="target_date" type="date" class="form-control" value="2026-05-15">
+                                            <label class="form-label fw-bold">Target Date *</label>
+                                            <input name="target_date" type="date" class="form-control" value="2026-05-15" required>
                                         </div>
                                     </div>
                                     <div class="mb-3">
@@ -269,8 +267,8 @@
                                         </select>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label fw-bold">Comments</label>
-                                        <textarea name="comments" class="form-control">Scheduled for Q2 maintenance window.</textarea>
+                                        <label class="form-label fw-bold">Comments *</label>
+                                        <textarea name="comments" class="form-control" required>Scheduled for Q2 maintenance window.</textarea>
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label fw-bold">Effectiveness Review Date</label>

@@ -25,7 +25,6 @@
                                 <a class="nav-link dropdown-toggle active" href="#" data-bs-toggle="dropdown">Mitigations</a>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="{% url 'page' 'edit_mitigation' %}"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'page' 'add_mitigation' %}"><i class="bi bi-plus-circle me-2"></i>Add</a></li>
                                 </ul>
                             </li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
@@ -38,7 +37,6 @@
                                 <a class="nav-link dropdown-toggle active" href="#" data-bs-toggle="dropdown">Mitigations</a>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="{% url 'page' 'edit_mitigation' %}"><i class="bi bi-pencil-square me-2"></i>Edit</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'page' 'add_mitigation' %}"><i class="bi bi-plus-circle me-2"></i>Add</a></li>
                                 </ul>
                             </li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
@@ -61,7 +59,6 @@
                             <li class="nav-item"><a class="nav-link" href="{% url 'page' 'reports' %}">Reports</a></li>
                         {% else %}
 
-                            
                         {% endif %}
                 {% else %}
 
@@ -101,7 +98,6 @@
                                                     {% endfor %}
                                                 </select>
                                             {% endif %}
-                                        
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label fw-bold">Action Description *</label>
@@ -118,13 +114,13 @@
                                             </select>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label fw-bold">Target Date</label>
-                                            <input name="target_date" type="date" class="form-control">
+                                            <label class="form-label fw-bold">Target Date *</label>
+                                            <input name="target_date" type="date" class="form-control" required>
                                         </div>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label fw-bold">Progress Status</label>
-                                        <select name="mitigation_status" class="form-select">
+                                        <label class="form-label fw-bold">Progress Status *</label>
+                                        <select name="mitigation_status" class="form-select" required>
 
                                             <option value="Not Started">Not Started</option>
                                             <option value="In Progress">In Progress</option>
@@ -132,12 +128,12 @@
                                         </select>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label fw-bold">Comments</label>
-                                        <textarea name="comments" class="form-control"></textarea>
+                                        <label class="form-label fw-bold">Comments *</label>
+                                        <textarea name="comments" class="form-control" required></textarea>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label fw-bold">Effectiveness Review Date</label>
-                                        <input name="effectiveness_review_date" type="date" class="form-control">
+                                        <label class="form-label fw-bold">Effectiveness Review Date *</label>
+                                        <input name="effectiveness_review_date" type="date" class="form-control" required>
                                     </div>
                                     <div class="text-end">
                                         <a href="{% url 'page' 'risks' %}" class="btn btn-light border">Cancel</a>
@@ -176,25 +172,25 @@
                                             </select>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label fw-bold">Target Date</label>
-                                            <input name="target_date" type="date" class="form-control">
+                                            <label class="form-label fw-bold">Target Date *</label>
+                                            <input name="target_date" type="date" class="form-control" required>
                                         </div>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label fw-bold">Progress Status</label>
-                                        <select name="mitigation_status_id" class="form-select">
+                                        <label class="form-label fw-bold">Progress Status *</label>
+                                        <select name="mitigation_status_id" class="form-select" required>
                                             <option value="Not Started">Not Started</option>
                                             <option value="In Progress">In Progress</option>
                                             <option value="Completed">Completed</option>
                                         </select>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label fw-bold">Comments</label>
-                                        <textarea name="comments" class="form-control"></textarea>
+                                        <label class="form-label fw-bold">Comments *</label>
+                                        <textarea name="comments" class="form-control" required></textarea>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label fw-bold">Effectiveness Review Date</label>
-                                        <input name="effectiveness_review_date" type="date" class="form-control">
+                                        <label class="form-label fw-bold">Effectiveness Review Date *</label>
+                                        <input name="effectiveness_review_date" type="date" class="form-control" required>
                                     </div>
                                     <div class="text-end">
                                         <a href="{% url page 'add_mitigation' %}" class="btn btn-light border">Cancel</a>
