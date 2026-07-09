@@ -73,7 +73,7 @@
                 
             </ul>
             <div class="d-flex align-items-center">
-                <span class="text-light me-3"><i class="bi bi-person-circle me-1"></i>{{ user.username }} (Admin)</span>
+                <span class="text-light me-3"><i class="bi bi-person-circle me-1"></i>{{ user.username }} {%if is_admin%}(Admin){%elif is_risk_manager%}(Risk Manager){%elif is_auditor%}(Auditor){%elif is_viewer%}(Viewer){%elif is_owner%}(Asset Owner){%endif%}</span>
                 <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Logout</a>
             </div>
         </div>
@@ -88,12 +88,34 @@
         <p class="text-muted mb-0">Asset ID {{ asset.asset }}</p>
     
     </div>
-    <div class="d-flex gap-2">
-        <a href="{% url 'page' 'assets' %}" class="btn btn-light border">Back</a>
-        <a href="{% url 'edit_asset' asset.asset %}" class="btn btn-primary">Edit</a>
-        <a href="{% url 'add_asset_risk' asset.asset %}" class="btn btn-danger">Add Risk</a>
+    
+
+    {% if user.is_authenticated %}
+                {% if is_admin %}
+                    <div class="d-flex gap-2">
+                    <a href="{% url 'page' 'assets' %}" class="btn btn-light border">Back</a>
+                    <a href="{% url 'edit_asset' asset.asset %}" class="btn btn-primary">Edit</a>
+                    <a href="{% url 'add_asset_risk' asset.asset %}" class="btn btn-danger">Add Risk</a>
+                </div>
+                {% elif is_risk_manager %}
+                        
+                {% elif is_auditor %}
+                        
+                {% elif is_viewer %} 
+                    
+                {% elif is_owner %}   
+                    <div class="d-flex gap-2">
+                    <a href="{% url 'page' 'assets' %}" class="btn btn-light border">Back</a>
+                    </div>                 
+                {% endif %}
+        {% else %}
+
+ {% endif %}
+
+
     </div>
-</div>
+
+
 
 <div class="card shadow-sm">
     <div class="card-body">

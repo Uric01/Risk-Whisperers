@@ -31,3 +31,28 @@
               
             </tbody>
         </table>
+
+
+
+
+
+
+
+
+
+        {% if user.is_authenticated %}
+                        {% if is_admin %}
+                            
+                        {% elif is_risk_manager %}
+                                
+                        {% elif is_auditor %}
+                               
+                        {% elif is_viewer %}
+                                
+                         {% elif is_owner %}  
+
+                            
+                        {% endif %}
+                {% else %}
+
+            {% endif %}

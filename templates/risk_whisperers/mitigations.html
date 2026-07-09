@@ -68,7 +68,7 @@
                 {% endif %}
             </ul>
             <div class="d-flex align-items-center">
-                <span class="text-light me-3"><i class="bi bi-person-circle me-1"></i>{{ user.username }} (Admin)</span>
+                <span class="text-light me-3"><i class="bi bi-person-circle me-1"></i>{{ user.username }} {%if is_admin%}(Admin){%elif is_risk_manager%}(Risk Manager){%elif is_auditor%}(Auditor){%elif is_viewer%}(Viewer){%elif is_owner%}(Asset Owner){%endif%}</span>
                 <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Logout</a>
             </div>
         </div>
@@ -81,9 +81,22 @@
         <h2>Mitigation Actions</h2>
         <p class="text-muted mb-0">Track risk mitigation progress.</p>
     </div>
-   
-    <a href="{% url 'page' 'add_mitigation' %}" class="btn btn-success">Add Mitigation</a>
-    
+     {% if user.is_authenticated %}
+                        {% if is_admin %}
+                            <a href="{% url 'page' 'add_mitigation' %}" class="btn btn-success">Add Mitigation</a>
+                        {% elif is_risk_manager %}
+                             <a href="{% url 'page' 'add_mitigation' %}" class="btn btn-success">Add Mitigation</a>
+                        {% elif is_auditor %}
+                               
+                        {% elif is_viewer %}
+                                
+                         {% elif is_owner %}  
+                           
+                            
+                        {% endif %}
+                {% else %}
+
+            {% endif %}
 </div>
 {% if messages %}
         <div class="container mt-3">
@@ -103,6 +116,23 @@
                 <tr>
                     <th>ID</th><th>Risk</th><th>Action</th><th>Assigned To</th>
                     <th>Target Date</th><th>Status</th><th>Review Date</th>
+                    {% if user.is_authenticated %}
+                        {% if is_admin %}
+                            <th>Action</th>
+                        {% elif is_risk_manager %}
+                            <th>Action</th>
+                        {% elif is_auditor %}
+                               
+                        {% elif is_viewer %}
+                                
+                         {% elif is_owner %}  
+                            <th>Action</th>
+                            
+                        {% endif %}
+                {% else %}
+
+            {% endif %}
+                    
                 </tr>
             </thead>
             <tbody>
@@ -113,9 +143,25 @@
                         <td>{{ mitigation.risk_id}}</td>
                         <td>{{ mitigation.action_description}}</td>
                         <td>{{ mitigation.assigned_to_id}}</td>
-                        <td>{{ mitigation.target_date}}</td>
+                        <td>{{ mitigation.target_date}}</td> 
                         <td>{{ mitigation.progress_status}}</td>
                         <td>{{ mitigation.effectiveness_review_date}}</td>
+                        {% if user.is_authenticated %}
+                        {% if is_admin %}
+                            <td><a class="btn btn-sm btn-outline-secondary" href="{% url 'edit_mitigation' mitigation.mitigation_id %}">Edit</a></td>
+                        {% elif is_risk_manager %}
+                            <td><a class="btn btn-sm btn-outline-secondary" href="{% url 'edit_mitigation' mitigation.mitigation_id %}">Edit</a></td>
+                        {% elif is_auditor %}
+                               
+                        {% elif is_viewer %}
+
+                         {% elif is_owner %}  
+                           <td><a class="btn btn-sm btn-outline-secondary" href="{% url 'edit_mitigation' mitigation.mitigation_id %}">Edit</a></td>
+                        {% endif %}
+                            {% else %}
+
+                        {% endif %}
+                        
                         </tr>
                     {% endfor %}
         </table>

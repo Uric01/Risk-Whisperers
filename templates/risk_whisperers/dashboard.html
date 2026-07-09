@@ -70,7 +70,7 @@
                 {% endif %}
             </ul>
             <div class="d-flex align-items-center">
-                <span class="text-light me-3"><i class="bi bi-person-circle me-1"></i>{{ user.username }} (Admin)</span>
+                <span class="text-light me-3"><i class="bi bi-person-circle me-1"></i>{{ user.username }} {%if is_admin%}(Admin){%elif is_risk_manager%}(Risk Manager){%elif is_auditor%}(Auditor){%elif is_viewer%}(Viewer){%elif is_owner%}(Asset Owner){%endif%}</span>
                 <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Logout</a>
             </div>
         </div>
@@ -100,7 +100,6 @@
                 <a href=href="{% url 'add_asset' %}" class="btn btn-primary">Add Asset</a>
                 <a href="{% url 'page' 'add_risk' %}" class="btn btn-danger">Add Risk</a>
             {% elif is_auditor %}
-                <a href="{% url 'page' 'assets' %}" class="btn btn-outline-primary">View Assets</a>
                 <a href="{% url 'page' 'assets' %}" class="btn btn-outline-primary">View Assets</a>
                 <a href="{% url 'page' 'reports' %}" class="btn btn-outline-secondary">View Reports</a>
                 <a href="{% url 'page' 'mitigations' %}" class="btn btn-outline-success"> View Mitigations</a>

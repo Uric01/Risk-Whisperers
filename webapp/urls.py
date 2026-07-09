@@ -3,7 +3,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-   
+    path('edit_mitigation/<int:mitigation_id>/', views.edit_mitigation, name='edit_mitigation'),
+    path("get-mitigation/<int:risk_id>/", views.get_mitigation, name="get_mitigation"),
     path('risk/add_asset_risk/<int:asset_id>', views.add_asset_risk, name='add_asset_risk'),
     path('risk/view_risk_add_mitigation/<int:risk_id>/', views.view_risk_add_mitigation,name='view_risk_add_mitigation'),
     path('risk/view_risk_edit/<int:risk_id>/', views.view_risk_edit, name='view_risk_edit'),

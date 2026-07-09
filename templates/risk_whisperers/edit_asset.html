@@ -71,7 +71,7 @@
                 
             </ul>
             <div class="d-flex align-items-center">
-                <span class="text-light me-3"><i class="bi bi-person-circle me-1"></i>{{ user.username }} (Admin)</span>
+                <span class="text-light me-3"><i class="bi bi-person-circle me-1"></i>{{ user.username }} {%if is_admin%}(Admin){%elif is_risk_manager%}(Risk Manager){%elif is_auditor%}(Auditor){%elif is_viewer%}(Viewer){%elif is_owner%}(Asset Owner){%endif%}</span>
                 <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Logout</a>
             </div>
         </div>

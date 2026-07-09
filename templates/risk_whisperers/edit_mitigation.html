@@ -68,7 +68,7 @@
                 
             </ul>
             <div class="d-flex align-items-center">
-                <span class="text-light me-3"><i class="bi bi-person-circle me-1"></i>{{ user.username }} (Admin)</span>
+                <span class="text-light me-3"><i class="bi bi-person-circle me-1"></i>{{ user.username }} {%if is_admin%}(Admin){%elif is_risk_manager%}(Risk Manager){%elif is_auditor%}(Auditor){%elif is_viewer%}(Viewer){%elif is_owner%}(Asset Owner){%endif%}</span>
                 <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Logout</a>
             </div>
         </div>
@@ -89,6 +89,8 @@
                                         {% csrf_token %} 
                                         <div class="mb-3">
                                             <label class="form-label fw-bold">Risk *</label>
+
+                                            {%if not selected_mitigation_to_edit.mitigation_id %}
                                             <select name="risk_id" class="form-select" required>
                                                 <option value="" selected>Select risk...</option>
                                                 {% for risk in risks %}
@@ -97,11 +99,19 @@
                                                     </option>
                                                 {% endfor %}
                                             </select>
+                                            {%else%}
+                                            <input type="text" class="form-control" value="{{ selected_mitigation_to_edit.risk_id }} - {{  selected_mitigation_to_edit.risk.risk_description }}" readonly>
+                                            {% endif %}
                                         </div>
                                         
                                         <div class="mb-3">
                                             <label class="form-label fw-bold">Action Description *</label>
-                                            <textarea name="action_description" class="form-control" required></textarea>
+                                            
+                                            {%if not selected_mitigation_to_edit.mitigation_id %}
+                                              <textarea name="action_description" class="form-control" required></textarea> 
+                                            {%else%}
+                                            <textarea name="action_description" class="form-control" required>{{ selected_mitigation_to_edit.action_description }}</textarea>
+                                            {% endif %}
                                         </div>
                                         
                                         <div class="row">
@@ -109,34 +119,55 @@
                                                 <label class="form-label fw-bold">Assigned To *</label>
                                                  <select name="assigned_to" class="form-select" required>
                                                     <option value="" selected>Select asset owner..</option>
+                                                    {%if not selected_mitigation_to_edit.mitigation_id %}
                                                     {% for all_username in all_usernames %}
                                                         <option value="{{ all_username }}">{{ all_username }}</option>
                                                     {% endfor %}
+                                                    {%else%}
+                                                    <option value="{{ selected_mitigation_to_edit.assigned_to }}"selected>{{ selected_mitigation_to_edit.assigned_to }}</option>
+                                                    {% endif %}
+
                                                 </select>
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label fw-bold">Target Date *</label>
-                                                <input name="target_date" type="date" class="form-control" value="{{ mitigation.target_date|date:'Y-m-d' }}" required>
+                                               
+
+                                            {%if not selected_mitigation_to_edit.mitigation_id %}
+                                               <input name="target_date" type="date" class="form-control" value="{{ mitigation.target_date|date:'Y-m-d' }}" required> 
+                                            {%else%}
+                                             <input name="target_date" type="date" class="form-control" value="{{ selected_mitigation_to_edit.target_date|date:'Y-m-d' }}" required>
+                                            {% endif %}
                                             </div>
                                         </div>
                                         
                                         <div class="mb-3">
                                             <label class="form-label fw-bold">Progress Status *</label>
                                             <select name="mitigation_status" class="form-select" required>
-                                                <option value="Not Started">Not Started</option>
-                                                <option value="In Progress" >In Progress</option>
-                                                <option value="Completed" >Completed</option>
+                                                <option value="Not Started" {%if selected_mitigation_to_edit.progress_status == "Not Started"%}selected{% endif %}>Not Started</option>
+                                                <option value="In Progress" {%if selected_mitigation_to_edit.progress_status == "In Progress"%}selected{% endif %}>In Progress</option>
+                                                <option value="Completed" {%if selected_mitigation_to_edit.progress_status == "Completed"%}selected{% endif %}>Completed</option>
                                             </select>
                                         </div>
                                         
                                         <div class="mb-3">
                                             <label class="form-label fw-bold">Comments *</label>
-                                            <textarea name="comments" class="form-control" required>{{ mitigation.comments }}</textarea>
+                                            {%if not selected_mitigation_to_edit.mitigation_id %}
+                                               <textarea name="comments" class="form-control" required>{{ mitigation.comments }}</textarea>
+                                            {%else%}
+                                             <textarea name="comments" class="form-control" required>{{ selected_mitigation_to_edit.comments }}</textarea>
+                                            {% endif %}
                                         </div>
                                         
                                         <div class="mb-3">
                                             <label class="form-label fw-bold">Effectiveness Review Date *</label>
-                                            <input name="effectiveness_review_date" type="date" class="form-control" value="{{ mitigation.effectiveness_review_date|date:'Y-m-d' }}" required>
+
+                                            {%if not selected_mitigation_to_edit.mitigation_id %}
+                                               <input name="effectiveness_review_date" type="date" class="form-control" value="{{ mitigation.effectiveness_review_date|date:'Y-m-d' }}" required>
+                                            {%else%}
+                                             <input name="effectiveness_review_date" type="date" class="form-control" value="{{ selected_mitigation_to_edit.effectiveness_review_date|date:'Y-m-d' }}" required>
+                                            {% endif %}
+
                                         </div>
                                         
                                         <div class="text-end">
@@ -150,7 +181,7 @@
                 </div>
             </div>
         {% elif is_risk_manager %}
-                <div class="container">
+            <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-md-8">
                         <div class="card shadow-sm border-success border-top border-4">
@@ -162,6 +193,8 @@
                                         {% csrf_token %} 
                                         <div class="mb-3">
                                             <label class="form-label fw-bold">Risk *</label>
+
+                                            {%if not selected_mitigation_to_edit.mitigation_id %}
                                             <select name="risk_id" class="form-select" required>
                                                 <option value="" selected>Select risk...</option>
                                                 {% for risk in risks %}
@@ -170,46 +203,80 @@
                                                     </option>
                                                 {% endfor %}
                                             </select>
+                                            {%else%}
+                                            <input type="text" class="form-control" value="{{ selected_mitigation_to_edit.risk_id }} - {{  selected_mitigation_to_edit.risk.risk_description }}" readonly>
+                                            {% endif %}
                                         </div>
                                         
                                         <div class="mb-3">
                                             <label class="form-label fw-bold">Action Description *</label>
-                                            <textarea name="action_description" class="form-control" required></textarea>
+                                            
+                                            {%if not selected_mitigation_to_edit.mitigation_id %}
+                                              <textarea name="action_description" class="form-control" required></textarea> 
+                                            {%else%}
+                                            <textarea name="action_description" class="form-control" required>{{ selected_mitigation_to_edit.action_description }}</textarea>
+                                            {% endif %}
                                         </div>
                                         
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label fw-bold">Assigned To *</label>
-                                                <select name="assigned_to" class="form-select" required>
-                                                   <option value="" selected>Select asset owner..</option>
-                                                        {% for owner in owners %}
-                                                            <option value="{{ owner }}">{{ owner }}</option>
-                                                        {% endfor %}
+                                                 <select name="assigned_to" class="form-select" required>
+                                                    <option value="" selected>Select asset owner..</option>
+                                                    
+
+                                                    {%if not selected_mitigation_to_edit.mitigation_id %}
+                                                    {% for all_username in all_usernames %}
+                                                        <option value="{{ all_username }}" {%if selected_mitigation_to_edit.progress_status == "Not Started"%}selected{% endif %}>{{ all_username }}</option>
+                                                    {% endfor %}
+                                                    {%else%}
+                                                    <option value="{{ selected_mitigation_to_edit.assigned_to }}" selected>{{ selected_mitigation_to_edit.assigned_to }}</option>
+                                                    {% endif %}
+
                                                 </select>
+                                                
+
+                                                
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label fw-bold">Target Date *</label>
-                                                <input name="target_date" type="date" class="form-control" value="{{ mitigation.target_date|date:'Y-m-d' }}" required>
+                                               
+
+                                            {%if not selected_mitigation_to_edit.mitigation_id %}
+                                               <input name="target_date" type="date" class="form-control" value="{{ mitigation.target_date|date:'Y-m-d' }}" required> 
+                                            {%else%}
+                                             <input name="target_date" type="date" class="form-control" value="{{ selected_mitigation_to_edit.target_date|date:'Y-m-d' }}" required>
+                                            {% endif %}
                                             </div>
                                         </div>
                                         
                                         <div class="mb-3">
                                             <label class="form-label fw-bold">Progress Status *</label>
-                                            <select name="mitigation_status_id" class="form-select" required>
-                                                <option value="Not Started" {% if mitigation.status_id == 'Not Started' %}selected{% endif %}>Not Started</option>
-                                                <option value="In Progress" >In Progress</option>
-                                                <option value="Completed" >Completed</option>
+                                            <select name="mitigation_status" class="form-select" required>
+                                                <option value="Not Started" {%if selected_mitigation_to_edit.progress_status == "Not Started"%}selected{% endif %}>Not Started</option>
+                                                <option value="In Progress" {%if selected_mitigation_to_edit.progress_status == "In Progress"%}selected{% endif %}>In Progress</option>
+                                                <option value="Completed" {%if selected_mitigation_to_edit.progress_status == "Completed"%}selected{% endif %}>Completed</option>
                                             </select>
                                         </div>
                                         
                                         <div class="mb-3">
                                             <label class="form-label fw-bold">Comments *</label>
-                                            <textarea name="comments" class="form-control" required>{{ mitigation.comments }}</textarea>
+                                            {%if not selected_mitigation_to_edit.mitigation_id %}
+                                               <textarea name="comments" class="form-control" required>{{ mitigation.comments }}</textarea>
+                                            {%else%}
+                                             <textarea name="comments" class="form-control" required>{{ selected_mitigation_to_edit.comments }}</textarea>
+                                            {% endif %}
                                         </div>
                                         
                                         <div class="mb-3">
                                             <label class="form-label fw-bold">Effectiveness Review Date *</label>
-                                            <input name="effectiveness_review_date" type="date" class="form-control" value="{{ mitigation.effectiveness_review_date|date:'Y-m-d' }}" required>
+
+                                            {%if not selected_mitigation_to_edit.mitigation_id %}
+                                               <input name="effectiveness_review_date" type="date" class="form-control" value="{{ mitigation.effectiveness_review_date|date:'Y-m-d' }}" required>
+                                            {%else%}
+                                             <input name="effectiveness_review_date" type="date" class="form-control" value="{{ selected_mitigation_to_edit.effectiveness_review_date|date:'Y-m-d' }}" required>
+                                            {% endif %}
+
                                         </div>
                                         
                                         <div class="text-end">
@@ -232,54 +299,106 @@
                     <div class="col-md-8">
                         <div class="card shadow-sm border-success border-top border-4">
                             <div class="card-header bg-white">
-                                <h4 class="text-success">Edit Mitigation Action</h4>
-                                <p class="text-muted mb-0 small">MIT-1</p>
-                            </div>
-                            <div class="card-body">
-                                <form method="post">
-                                    <input type="hidden" name="mitigation_id" value="1">
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">Risk *</label>
-                                        <select name="risk_id" class="form-select" required>
-                                            <option value="101" selected>RSK-101: Unauthorized access</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">Action Description *</label>
-                                        <textarea name="action_description" class="form-control" required>Install network segmentation</textarea>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label fw-bold">Assigned To *</label>
-                                            <select name="assigned_to" class="form-select" required>
-                                                <option value="2" selected>John Doe</option>
+                                    <h4 class="text-success">Edit Mitigation Action</h4>
+                                </div>
+                                <div class="card-body">
+                                    <form method="post" action="{% url 'edit_risk_mitigation' %}">
+                                        {% csrf_token %} 
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Risk *</label>
+
+                                            {%if not selected_mitigation_to_edit.mitigation_id %}
+                                            <select name="risk_id" class="form-select" required>
+                                                <option value="" selected>Select risk...</option>
+                                                {% for risk in risks %}
+                                                    <option value="{{ risk.risk_id }}">
+                                                        {{ risk.risk_id }} - {{ risk.risk_description }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                            {%else%}
+                                            <input type="text" class="form-control" value="{{ selected_mitigation_to_edit.risk_id }} - {{  selected_mitigation_to_edit.risk.risk_description }}" readonly>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Action Description *</label>
+                                            
+                                            {%if not selected_mitigation_to_edit.mitigation_id %}
+                                              <textarea name="action_description" class="form-control" required></textarea> 
+                                            {%else%}
+                                            <textarea name="action_description" class="form-control" required>{{ selected_mitigation_to_edit.action_description }}</textarea>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-bold">Assigned To *</label>
+                                                 
+                                                    
+                                                    {%if not selected_mitigation_to_edit.mitigation_id %}
+                                                    <option value="" selected>Select asset owner..</option>
+                                                    <select name="assigned_to" class="form-select" required readonly>
+                                                    {% for all_username in all_usernames %}
+                                                        <option value="{{ all_username }}" {%if selected_mitigation_to_edit.progress_status == "Not Started"%}selected{% endif %}>{{ all_username }}</option>
+                                                    {% endfor %}
+                                                     </select>
+                                                    {%else%}
+                                                    <input type="text" name="assigned_to" value="{{ selected_mitigation_to_edit.assigned_to }}" class="form-control" readonly>
+                                                    {% endif %}
+
+                                                
+                                                
+
+                                                
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-bold">Target Date *</label>
+                                               
+
+                                            {%if not selected_mitigation_to_edit.mitigation_id %}
+                                               <input name="target_date" type="date" class="form-control" value="{{ mitigation.target_date|date:'Y-m-d' }}" required> 
+                                            {%else%}
+                                             <input name="target_date" type="date" class="form-control" value="{{ selected_mitigation_to_edit.target_date|date:'Y-m-d' }}" required>
+                                            {% endif %}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Progress Status *</label>
+                                            <select name="mitigation_status" class="form-select" required>
+                                                <option value="Not Started" {%if selected_mitigation_to_edit.progress_status == "Not Started"%}selected{% endif %}>Not Started</option>
+                                                <option value="In Progress" {%if selected_mitigation_to_edit.progress_status == "In Progress"%}selected{% endif %}>In Progress</option>
+                                                <option value="Completed" {%if selected_mitigation_to_edit.progress_status == "Completed"%}selected{% endif %}>Completed</option>
                                             </select>
                                         </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label fw-bold">Target Date *</label>
-                                            <input name="target_date" type="date" class="form-control" value="2026-05-15" required>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Comments *</label>
+                                            {%if not selected_mitigation_to_edit.mitigation_id %}
+                                               <textarea name="comments" class="form-control" required>{{ mitigation.comments }}</textarea>
+                                            {%else%}
+                                             <textarea name="comments" class="form-control" required>{{ selected_mitigation_to_edit.comments }}</textarea>
+                                            {% endif %}
                                         </div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">Progress Status</label>
-                                        <select name="mitigation_status_id" class="form-select">
-                                            <option value="2" selected>In Progress</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">Comments *</label>
-                                        <textarea name="comments" class="form-control" required>Scheduled for Q2 maintenance window.</textarea>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">Effectiveness Review Date</label>
-                                        <input name="effectiveness_review_date" type="date" class="form-control" value="2026-07-01">
-                                    </div>
-                                    <div class="text-end">
-                                        <a href="mitigations.html" class="btn btn-light border">Cancel</a>
-                                        <button class="btn btn-success">Update Mitigation</button>
-                                    </div>
-                                </form>
-                            </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Effectiveness Review Date *</label>
+
+                                            {%if not selected_mitigation_to_edit.mitigation_id %}
+                                               <input name="effectiveness_review_date" type="date" class="form-control" value="{{ mitigation.effectiveness_review_date|date:'Y-m-d' }}" required>
+                                            {%else%}
+                                             <input name="effectiveness_review_date" type="date" class="form-control" value="{{ selected_mitigation_to_edit.effectiveness_review_date|date:'Y-m-d' }}" required>
+                                            {% endif %}
+
+                                        </div>
+                                        
+                                        <div class="text-end">
+                                            <a href="{% url 'page' 'mitigations' %}" class="btn btn-light border">Cancel</a>
+                                            <button type="submit" class="btn btn-success">Update Mitigation</button>
+                                        </div>
+                                    </form>
+                                </div>
                         </div>
                     </div>
                 </div>

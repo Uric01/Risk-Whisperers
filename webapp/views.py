@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q, Min
 from django.contrib import messages
+from django.http import JsonResponse
 
 
 
@@ -91,6 +92,13 @@ def page(request, page_name):
     else:
         page_obj = paginator.get_page(page_number)
         paged_auditlogs = page_obj.object_list
+        
+    user = request.user
+    all_users = User.objects.all()
+    
+    #Extract user group
+    first_group = user.groups.first()
+    first_group_name = first_group.name if first_group else "No Group"
     
     asset_owners = User.objects.filter(groups__name="Asset_Owner").values_list('username', flat=True)
     asset_owner_list = list(asset_owners)
@@ -103,8 +111,7 @@ def page(request, page_name):
     
     if not template:
         raise Http404('Page not found')
-    user = request.user
-    all_users = User.objects.all()
+   
 
     if page_name == 'assets':
         paginator = Paginator(all_assets, 10)
@@ -137,6 +144,7 @@ def page(request, page_name):
             "page_obj": page_obj,
             "paginator": paginator,
             "page_range": paginator.get_elided_page_range(number=page_obj.number),
+            "first_group_name":first_group_name
         }
     else:
         context = {
@@ -163,10 +171,9 @@ def page(request, page_name):
         "page_obj": page_obj,
         "paginator": paginator,
         "page_range": paginator.get_elided_page_range(number=page_obj.number),
+         "first_group_name":first_group_name
     }
-        
-        
-        
+
     if page_name == 'risks':
         paginator = Paginator(all_risks, 10)
         page_number = request.GET.get("page", 1)
@@ -309,7 +316,20 @@ def add_asset(request):
             new_asset.asset, 
             f"Created new asset: {new_asset.asset_name}"
             )
-        print(f"Asset saved with ID: {new_asset.asset}")
+        
+        logged_in_username = request.user.username
+        auth_asset_owner = Asset.objects.values_list("asset_owner", flat=True)
+        db_asset_owners = User.objects.filter(groups__name="Asset_Owner")
+        
+        for username_ in db_asset_owners:
+            if not logged_in_username == username_:
+                all_assets = Asset.objects().all()
+            else:
+                for db_asset_owner in auth_asset_owner:
+                   if db_asset_owner == logged_in_username:
+                        all_assets = Asset.objects().filers(asset_owner=logged_in_username)
+      
+            
         user = request.user
         context = {
         "is_admin": user.groups.filter(name="Admin").exists() if user.is_authenticated else False,
@@ -494,13 +514,16 @@ def view_asset(request, asset_id):
     
     all_mitigations = Mitigation.objects.all()
     target_dates = all_mitigations.values_list("target_date", flat=True)
+    all_assets = Asset.objects.all()
+    
+
     current_date = date.today()
     count = 0
     for target_date in target_dates:
         if current_date > target_date:
             count += 1
     
-    selected_asset = get_object_or_404(Asset, asset=asset_id)
+    selected_asset = get_object_or_404(all_assets, asset=asset_id)
     
     user = request.user
     context = {
@@ -775,7 +798,35 @@ def risk_filter(request):
 
     return render(request, ALLOWED_PAGES['risks'], context)
 
-
+@login_required
+def edit_mitigation(request, mitigation_id):
+    
+    all_assets = Asset.objects.all()
+    all_risks = Risk.objects.all()
+    all_mitigations = Mitigation.objects.all()
+    target_dates = all_mitigations.values_list("target_date", flat=True)
+    current_date = date.today()
+    count = 0
+    for target_date in target_dates:
+        if current_date > target_date:
+            count += 1
+    
+    selected_mitigation_to_edit = get_object_or_404(Mitigation, mitigation_id=mitigation_id)
+    
+    user = request.user
+    context = {
+        "selected_mitigation_to_edit": selected_mitigation_to_edit,
+        "is_admin": user.groups.filter(name="Admin").exists() if user.is_authenticated else False,
+        "is_risk_manager": user.groups.filter(name="Risk_Manager").exists() if user.is_authenticated else False,
+        "is_auditor": user.groups.filter(name="Auditor").exists() if user.is_authenticated else False,
+        "is_viewer": user.groups.filter(name="viewer").exists() if user.is_authenticated else False,
+        "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
+        "risks": all_risks,
+        "assets": all_assets,
+        "mitigations":all_mitigations,
+    }
+    
+    return render(request, ALLOWED_PAGES['edit_mitigation'], context)
 
 @login_required
 def view_risk(request, risk_id):
@@ -1046,10 +1097,40 @@ def edit_risk_mitigation(request):
         "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
         "assets": all_assets,
         "owners": asset_owner_list,
+        "user": user,
     }
     
     # Ensure this points to the correct HTML template for editing mitigations
     return render(request, ALLOWED_PAGES['edit_mitigation'], context)
+
+
+def get_mitigation(request, risk_id):
+    """
+    Fetches the mitigation details for a specific risk and returns them as JSON.
+    """
+    try:
+        # We use .first() in case there are multiple, but ideally, this is a 1-to-1 relationship
+        mitigation = Mitigation.objects.filter(risk_id=risk_id).first()
+        
+        if mitigation:
+            # Map the exact fields from your models.py
+            data = {
+                'action_description': mitigation.action_description,
+                # Return the ID of the assigned user so the dropdown can select the right person
+                'assigned_to': mitigation.assigned_to.id if mitigation.assigned_to else None,
+                'target_date': mitigation.target_date.strftime('%Y-%m-%d') if mitigation.target_date else '',
+                'progress_status': mitigation.progress_status,
+                'comments': mitigation.comments,
+                'effectiveness_review_date': mitigation.effectiveness_review_date.strftime('%Y-%m-%d') if mitigation.effectiveness_review_date else '',
+            }
+            return JsonResponse({'success': True, 'data': data})
+        else:
+            # Return empty strings if no mitigation exists for this risk yet
+            return JsonResponse({'success': False, 'message': 'No mitigation found.'})
+            
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
 
 @login_required
 def report_filter(request):
