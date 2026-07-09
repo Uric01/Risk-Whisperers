@@ -76,6 +76,12 @@ def page(request, page_name):
     all_risks_statuses = Risk.objects.values_list("risk_status", flat=True).distinct().order_by("risk_status")
     all_usernames = User.objects.values_list("username", flat=True)
 
+    if request.user.groups.filter(name="Asset_Owner").exists():
+        all_assets = Asset.objects.filter(asset_owner=request.user.username)
+    else:
+        all_assets = Asset.objects.all()
+        
+        
     target_dates = all_mitigations.values_list("target_date", flat=True)
     current_date = date.today()
     count = 0
@@ -95,6 +101,8 @@ def page(request, page_name):
         
     user = request.user
     all_users = User.objects.all()
+    
+     
     
     #Extract user group
     first_group = user.groups.first()
@@ -359,6 +367,12 @@ def assets_filter(request):
     all_assets = Asset.objects.all()
     all_mitigations = Mitigation.objects.all()
     target_dates = all_mitigations.values_list("target_date", flat=True)
+    
+    if request.user.groups.filter(name="Asset_Owner").exists():
+        all_assets = Asset.objects.filter(asset_owner=request.user.username)
+    else:
+        all_assets = Asset.objects.all()
+        
     current_date = date.today()
     count = 0
     for target_date in target_dates:
@@ -516,6 +530,10 @@ def view_asset(request, asset_id):
     target_dates = all_mitigations.values_list("target_date", flat=True)
     all_assets = Asset.objects.all()
     
+    if request.user.groups.filter(name="Asset_Owner").exists():
+        all_assets = Asset.objects.filter(asset_owner=request.user.username)
+    else:
+        all_assets = Asset.objects.all()
 
     current_date = date.today()
     count = 0
@@ -549,7 +567,12 @@ def edit_asset(request, asset_id):
             count += 1
     
     # Fetch the existing asset
-    selected_asset = get_object_or_404(Asset, asset=asset_id)
+    if request.user.groups.filter(name="Asset_Owner").exists():
+        all_assets = Asset.objects.filter(asset_owner=request.user.username)
+    else:
+        all_assets = Asset.objects.all()
+        
+    selected_asset = get_object_or_404(all_assets, asset=asset_id)
 
     if request.method == "POST":
         # Update the object with new data from the form
@@ -607,8 +630,14 @@ def add_asset_risk(request, asset_id):
         if current_date > target_date:
             count += 1
     
+    
+    if request.user.groups.filter(name="Asset_Owner").exists():
+        all_assets = Asset.objects.filter(asset_owner=request.user.username)
+    else:
+        all_assets = Asset.objects.all()
+        
     # Fetch the existing asset
-    selected_asset = get_object_or_404(Asset, asset=asset_id)
+    selected_asset = get_object_or_404(all_assets, asset=asset_id)
 
     user = request.user
     context = {
@@ -687,8 +716,13 @@ def edit_risk(request, risk_id):
         if current_date > target_date:
             count += 1
     
+    if request.user.groups.filter(name="Risk_Manager").exists():
+        all_risks = Risk.objects.filter(asset__asset_owner=request.user.username)
+    else:
+        all_risks = Risk.objects.all()
+    
     # Fetch the existing asset
-    selected_risk = get_object_or_404(Risk, risk_id=risk_id)
+    selected_risk = get_object_or_404(all_risks, risk_id=risk_id)
 
     if request.method == "POST":
         # Update the object with new data from the form
@@ -749,6 +783,11 @@ def risk_filter(request):
     q = request.GET.get("q")
     asset_name_ = request.GET.get("asset_name_")
     risk_status = request.GET.get("risk_status")
+    
+    if request.user.groups.filter(name="Risk_Manager").exists():
+        all_risks = Risk.objects.filter(asset__asset_owner=request.user.username)
+    else:
+        all_risks = Risk.objects.all()
 
     if q:
         all_risks = all_risks.filter( Q(risk_description__icontains=q) |
@@ -768,7 +807,7 @@ def risk_filter(request):
     if q and risk_status:
         all_risks = all_risks.filter(risk_description__icontains=q).filter(risk_status=risk_status)
         
-    # --- PAGINATION (ADD THIS) ---
+    # --- PAGINATION ---
     paginator = Paginator(all_risks, 10)
     page_number = request.GET.get("page", 1)
     if page_number == "all":
@@ -841,7 +880,12 @@ def view_risk(request, risk_id):
         if current_date > target_date:
             count += 1
     
-    selected_risk = get_object_or_404(Risk, risk_id=risk_id)
+    if request.user.groups.filter(name="Risk_Manager").exists():
+        all_risks = Risk.objects.filter(asset__asset_owner=request.user.username)
+    else:
+        all_risks = Risk.objects.all()
+    
+    selected_risk = get_object_or_404(all_risks, risk_id=risk_id)
     annex_controls = []
     if selected_risk.annex_control:
         annex_controls = [item.strip() for item in str(selected_risk.annex_control).splitlines() if item.strip()]
@@ -875,7 +919,12 @@ def view_risk_edit(request, risk_id):
         if current_date > target_date:
             count += 1
     
-    selected_risk_to_edit = get_object_or_404(Risk, risk_id=risk_id)
+    if request.user.groups.filter(name="Risk_Manager").exists():
+        all_risks = Risk.objects.filter(asset__asset_owner=request.user.username)
+    else:
+        all_risks = Risk.objects.all()
+    
+    selected_risk_to_edit = get_object_or_404(all_risks, risk_id=risk_id)
     
     user = request.user
     context = {
