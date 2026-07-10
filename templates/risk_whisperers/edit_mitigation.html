@@ -87,6 +87,7 @@
                                 <div class="card-body">
                                     <form method="post" action="{% url 'edit_risk_mitigation' %}">
                                         {% csrf_token %} 
+                                         <input type="hidden" name="risk_id" value="{{ selected_mitigation_to_edit.risk_id }}">
                                         <div class="mb-3">
                                             <label class="form-label fw-bold">Risk *</label>
 
@@ -191,20 +192,20 @@
                                 <div class="card-body">
                                     <form method="post" action="{% url 'edit_risk_mitigation' %}">
                                         {% csrf_token %} 
+                                        <input type="hidden" name="risk_id" value="{{ selected_mitigation_to_edit.risk_id }}">
                                         <div class="mb-3">
                                             <label class="form-label fw-bold">Risk *</label>
-
-                                            {%if not selected_mitigation_to_edit.mitigation_id %}
-                                            <select name="risk_id" class="form-select" required>
-                                                <option value="" selected>Select risk...</option>
-                                                {% for risk in risks %}
-                                                    <option value="{{ risk.risk_id }}">
-                                                        {{ risk.risk_id }} - {{ risk.risk_description }}
-                                                    </option>
-                                                {% endfor %}
-                                            </select>
-                                            {%else%}
-                                            <input type="text" class="form-control" value="{{ selected_mitigation_to_edit.risk_id }} - {{  selected_mitigation_to_edit.risk.risk_description }}" readonly>
+                                            {% if not selected_mitigation_to_edit.mitigation_id %}
+                                                <select name="risk_id" class="form-select" required>
+                                                    <option value="" selected>Select risk...</option>
+                                                    {% for risk in risks %}
+                                                        <option value="{{ risk.risk_id }}">
+                                                            {{ risk.risk_id }} - {{ risk.risk_description }}
+                                                        </option>
+                                                    {% endfor %}
+                                                </select>
+                                            {% else %}
+                                                <input type="text" class="form-control" value="{{ selected_mitigation_to_edit.risk_id }} - {{ selected_mitigation_to_edit.risk.risk_description }}" readonly>
                                             {% endif %}
                                         </div>
                                         
@@ -234,9 +235,7 @@
                                                     {% endif %}
 
                                                 </select>
-                                                
-
-                                                
+  
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label fw-bold">Target Date *</label>
@@ -306,7 +305,7 @@
                                         {% csrf_token %} 
                                         <div class="mb-3">
                                             <label class="form-label fw-bold">Risk *</label>
-
+                                           
                                             {%if not selected_mitigation_to_edit.mitigation_id %}
                                             <select name="risk_id" class="form-select" required>
                                                 <option value="" selected>Select risk...</option>
@@ -347,10 +346,6 @@
                                                     <input type="text" name="assigned_to" value="{{ selected_mitigation_to_edit.assigned_to }}" class="form-control" readonly>
                                                     {% endif %}
 
-                                                
-                                                
-
-                                                
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label fw-bold">Target Date *</label>

@@ -91,14 +91,12 @@
                 <a href="{% url 'view_mitigation' %}" class="btn btn-outline-success"> View Mitigations</a>
                 <a href="{% url 'page' 'risks' %}" class="btn btn-outline-danger"> View Risks</a>
                 <a href="{% url 'page' 'reports' %}" class="btn btn-outline-secondary">View Reports</a>
-                <a href="{% url 'add_asset' %}" class="btn btn-primary">Add Asset</a>
-                <a href="{% url 'page' 'add_risk' %}" class="btn btn-danger">Add Risk</a>
+                
             {% elif is_risk_manager %}
                 <a href="{% url 'page' 'assets' %}" class="btn btn-outline-primary">View Assets</a>
                 <a href="{% url 'page' 'reports' %}" class="btn btn-outline-secondary">View Reports</a>
                 <a href="{% url 'page' 'mitigations' %}" class="btn btn-outline-success"> View Mitigations</a>
-                <a href=href="{% url 'add_asset' %}" class="btn btn-primary">Add Asset</a>
-                <a href="{% url 'page' 'add_risk' %}" class="btn btn-danger">Add Risk</a>
+               
             {% elif is_auditor %}
                 <a href="{% url 'page' 'assets' %}" class="btn btn-outline-primary">View Assets</a>
                 <a href="{% url 'page' 'reports' %}" class="btn btn-outline-secondary">View Reports</a>

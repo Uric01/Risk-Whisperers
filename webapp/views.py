@@ -2,7 +2,7 @@ import csv
 from io import BytesIO, StringIO
 from django.http import Http404, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from users.models import Asset, Risk, Mitigation, AuditLog, ActionType, OperationalStatus
+from users.models import Asset, Risk, Mitigation, AuditLog, ActionType
 from django.contrib.auth.models import User
 from datetime import date, datetime
 from django.contrib.auth.decorators import login_required
@@ -331,11 +331,11 @@ def add_asset(request):
         
         for username_ in db_asset_owners:
             if not logged_in_username == username_:
-                all_assets = Asset.objects().all()
+                all_assets = Asset.objects.all()
             else:
                 for db_asset_owner in auth_asset_owner:
                    if db_asset_owner == logged_in_username:
-                        all_assets = Asset.objects().filers(asset_owner=logged_in_username)
+                        all_assets = Asset.objects.filers(asset_owner=logged_in_username)
       
             
         user = request.user
@@ -885,7 +885,7 @@ def view_risk(request, risk_id):
     else:
         all_risks = Risk.objects.all()
     
-    selected_risk = get_object_or_404(all_risks, risk_id=risk_id)
+    selected_risk = get_object_or_404(Risk, risk_id=risk_id)
     annex_controls = []
     if selected_risk.annex_control:
         annex_controls = [item.strip() for item in str(selected_risk.annex_control).splitlines() if item.strip()]
@@ -919,12 +919,7 @@ def view_risk_edit(request, risk_id):
         if current_date > target_date:
             count += 1
     
-    if request.user.groups.filter(name="Risk_Manager").exists():
-        all_risks = Risk.objects.filter(asset__asset_owner=request.user.username)
-    else:
-        all_risks = Risk.objects.all()
-    
-    selected_risk_to_edit = get_object_or_404(all_risks, risk_id=risk_id)
+    selected_risk_to_edit = get_object_or_404(Risk, risk_id=risk_id)
     
     user = request.user
     context = {
@@ -1102,6 +1097,7 @@ def edit_risk_mitigation(request):
     asset_owner_list = list(asset_owners)
     if request.method == "POST":
         risk_id = request.POST.get("risk_id")
+        print("Risk ID is:", request.POST.get('risk_id'))
         #Fetch the selected risk to ensure it exists
         selected_risk = get_object_or_404(Risk, risk_id=risk_id)
         
@@ -1147,6 +1143,7 @@ def edit_risk_mitigation(request):
         "assets": all_assets,
         "owners": asset_owner_list,
         "user": user,
+        "selected_risk":selected_risk,
     }
     
     # Ensure this points to the correct HTML template for editing mitigations

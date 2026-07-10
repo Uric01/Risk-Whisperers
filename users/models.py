@@ -55,7 +55,7 @@ class ActionType(models.TextChoices):
     UPDATE = 'UPDATE', 'UPDATE'
     DELETE = 'DELETE', 'DELETE'
     LOGIN = 'LOGIN', 'LOGIN'
-
+    LOGOUT = 'LOGOUT', 'LOGOUT'
 class RiskCategory(models.TextChoices):
     DEFAULT_DATA = 'DEFAULT DATA', 'Default Data'
     CYBERSECURITY = 'CYBERSECURITY', 'Cybersecurity'
@@ -177,7 +177,7 @@ class AuditLog(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='audit_logs')
     action_type = models.CharField(max_length=10, choices=ActionType.choices)
     entity_name = models.CharField(max_length=100)
-    entity_id = models.CharField(max_length=50)
+    entity_id = models.CharField(max_length=100)
     action_date = models.DateTimeField(auto_now_add=True)
     action_details = models.TextField()
 
