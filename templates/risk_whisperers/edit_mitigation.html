@@ -303,7 +303,9 @@
                                 <div class="card-body">
                                     <form method="post" action="{% url 'edit_risk_mitigation' %}">
                                         {% csrf_token %} 
+                                        <input type="hidden" name="risk_id" value="{{ selected_mitigation_to_edit.risk_id }}">
                                         <div class="mb-3">
+                                            
                                             <label class="form-label fw-bold">Risk *</label>
                                            
                                             {%if not selected_mitigation_to_edit.mitigation_id %}
