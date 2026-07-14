@@ -102,8 +102,6 @@ def page(request, page_name):
     user = request.user
     all_users = User.objects.all()
     
-     
-    
     #Extract user group
     first_group = user.groups.first()
     first_group_name = first_group.name if first_group else "No Group"
@@ -113,7 +111,7 @@ def page(request, page_name):
     template = ALLOWED_PAGES.get(page_name)
     total_assets = all_assets.count()
     total_risks = all_risks.count()
-    total_open_risks = all_risks.filter(risk_status="OPEN").count()
+    total_open_risks = all_risks.filter(risk_status="Open").count()
     total_completed_mitigations = all_mitigations.filter(progress_status="Completed").count()
     overdue_mitigations_count =  count
     
@@ -868,6 +866,76 @@ def edit_mitigation(request, mitigation_id):
     return render(request, ALLOWED_PAGES['edit_mitigation'], context)
 
 @login_required
+def view_open_risks(request):
+    open_risks = Risk.objects.filter(risk_status="Open")
+    all_assets = Asset.objects.all()
+    all_mitigations = Mitigation.objects.all()
+    all_risks = Risk.objects.all()
+    target_dates = all_mitigations.values_list("target_date", flat=True)
+    current_date = date.today()
+    count = 0
+    for target_date in target_dates:
+        if current_date > target_date:
+            count += 1
+    q = request.GET.get("q")
+    asset_name_ = request.GET.get("asset_name_")
+    risk_status = request.GET.get("risk_status")
+    
+    if request.user.groups.filter(name="Risk_Manager").exists():
+        all_risks = Risk.objects.filter(asset__asset_owner=request.user.username)
+    else:
+        all_risks = Risk.objects.all()
+
+    if q:
+        all_risks = all_risks.filter( Q(risk_description__icontains=q) |
+        Q(risk_owner__icontains=q) |
+        Q(risk_status__icontains=q) |
+        Q(asset__asset_name__icontains=q))
+
+    if asset_name_:
+        
+        all_risks = all_risks.filter(asset__asset_name=asset_name_)
+        all_assets = all_assets.filter(asset_name=asset_name_)
+        
+
+    if risk_status:
+        all_risks = all_risks.filter(risk_status=risk_status)
+    
+    if q and risk_status:
+        all_risks = all_risks.filter(risk_description__icontains=q).filter(risk_status=risk_status)
+        
+    # --- PAGINATION ---
+    paginator = Paginator(open_risks, 10)
+    page_number = request.GET.get("page", 1)
+    if page_number == "all":
+        page_obj = paginator.get_page(1)
+        paged_risks = all_risks
+    else:
+        page_obj = paginator.get_page(page_number)
+        paged_risks = page_obj.object_list
+
+    
+    user = request.user
+    
+    context = {
+        "is_admin": user.groups.filter(name="Admin").exists() if user.is_authenticated else False,
+        "is_risk_manager": user.groups.filter(name="Risk_Manager").exists() if user.is_authenticated else False,
+        "is_auditor": user.groups.filter(name="Auditor").exists() if user.is_authenticated else False,
+        "is_viewer": user.groups.filter(name="viewer").exists() if user.is_authenticated else False,
+        "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
+        "assets": all_assets,
+        "risks" : all_risks,
+        "assets": all_assets,          # for the filter dropdown
+        "risks": paged_risks,          # use the paginated queryset
+        "page_obj": page_obj,
+        "paginator": paginator,
+        "page_range": paginator.get_elided_page_range(number=page_obj.number),
+    }
+
+    return render(request, ALLOWED_PAGES['risks'], context)
+    
+
+@login_required
 def view_risk(request, risk_id):
     
     all_assets = Asset.objects.all()
@@ -1080,6 +1148,52 @@ def view_mitigations(request):
         "page_range": paginator.get_elided_page_range(number=page_obj.number),
     }
     return render(request, ALLOWED_PAGES['mitigations'], context)
+
+
+@login_required
+def completed_mitigations(request):
+    completed_mitigations = Mitigation.objects.filter(progress_status="Completed")
+    all_assets = Asset.objects.all()
+    all_mitigations = Mitigation.objects.all()
+    target_dates = all_mitigations.values_list("target_date", flat=True)
+    current_date = date.today()
+    count = 0
+    for target_date in target_dates:
+        if current_date > target_date:
+            count += 1
+    
+    paginator = Paginator(completed_mitigations, 10)  # 10 per page
+    page_number = request.GET.get('page', 1)
+
+    if page_number == "all":
+        page_obj = paginator.get_page(1)
+        paged_mitigations = all_mitigations
+    else:
+        page_obj = paginator.get_page(page_number)
+        paged_mitigations = page_obj.object_list
+    
+    
+    user = request.user
+    
+    context = {
+        "is_admin": user.groups.filter(name="Admin").exists() if user.is_authenticated else False,
+        "is_risk_manager": user.groups.filter(name="Risk_Manager").exists() if user.is_authenticated else False,
+        "is_auditor": user.groups.filter(name="Auditor").exists() if user.is_authenticated else False,
+        "is_viewer": user.groups.filter(name="viewer").exists() if user.is_authenticated else False,
+        "is_owner": user.groups.filter(name="Asset_Owner").exists() if user.is_authenticated else False,
+        "assets": all_assets,
+        "mitigations": all_mitigations,
+        "mitigations": paged_mitigations,
+        "page_obj": page_obj,
+        "paginator": paginator,
+        "page_range": paginator.get_elided_page_range(number=page_obj.number),
+    }
+    return render(request, ALLOWED_PAGES['mitigations'], context)
+
+
+
+
+
 
 def edit_risk_mitigation(request):
     

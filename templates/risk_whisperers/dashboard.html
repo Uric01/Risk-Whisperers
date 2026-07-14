@@ -143,7 +143,7 @@
                     </a>
                 </div>
                 <div class="col-md-3">
-                    <a href="{% url 'page' 'risks' %}" class="text-decoration-none text-dark">
+                    <a href="{% url 'view_open_risks' %}" class="text-decoration-none text-dark">
                         <div class="card summary-card bg-warning text-dark h-100">
                             <div class="card-body d-flex justify-content-between align-items-center">
                                 <div><h6>Open Risks</h6><h2>{{total_open_risks}}</h2></div>
@@ -153,7 +153,7 @@
                     </a>
                 </div>
                 <div class="col-md-3">
-                    <a href="{% url 'page' 'mitigations' %}" class="text-decoration-none text-white">
+                    <a href="{% url 'completed_mitigations' %}" class="text-decoration-none text-white">
                         <div class="card summary-card bg-success h-100">
                             <div class="card-body d-flex justify-content-between align-items-center">
                                 <div><h6>Completed Mitigations</h6><h2>{{total_completed_mitigations}}</h2></div>
