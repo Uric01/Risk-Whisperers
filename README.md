@@ -1,10 +1,10 @@
-# RiskSys – Web-Based Asset Risk Management System
+# Risk-Whisperers (RiskSys) — Web-Based Asset Risk Management System
 
 ## Project Overview
 
-**RiskSys** is a web-based Asset Risk Management System developed as a final-year BSc Information Technology (Software Engineering) project. The application enables organisations to identify, assess, monitor, and mitigate risks associated with organisational assets while supporting the principles of **ISO/IEC 27001** and **ISO/IEC 27005**.
+Risk-Whisperers (a.k.a. RiskSys) is a web-based Asset Risk Management System developed as an academic final-year BSc Information Technology (Software Engineering) project. The repository contains a Django-based application together with static HTML prototypes and database export files used during development.
 
-The system replaces traditional spreadsheet-based risk registers with a secure, centralised platform that provides:
+The system replaces spreadsheet-based risk registers with a secure, centralised platform that provides:
 
 - Asset Management
 - Risk Register Management
@@ -14,307 +14,50 @@ The system replaces traditional spreadsheet-based risk registers with a secure, 
 - Reporting and Exporting
 - ISO 27001 Annex A Control Mapping
 
-The application is built using:
+The application code in this repository primarily uses:
 
-- **Python 3**
-- **Django**
-- **PostgreSQL**
-- **Bootstrap 5**
-- **HTML5**
-- **CSS3**
-- **JavaScript**
-- **ReportLab (PDF Generation)**
+- Python 3 / Django
+- PostgreSQL (schema / dumps included)
+- Bootstrap 5 / HTML / CSS / JavaScript
+- ReportLab (PDF generation helpers)
 
 ---
 
-# Features
+# Repository contents (high level)
 
-## Dashboard
+At the repository root you will find application code, database dumps, and a number of support directories:
 
-The dashboard provides a real-time overview of the organisation's security posture, including:
-
-- Total Assets
-- Total Risks
-- Open Risks
-- Completed Mitigations
-- Overdue Mitigations
-- Recent High-Risk Items
-
----
-
-## Asset Management
-
-The Asset Register allows users to:
-
-- Create assets
-- View assets
-- Edit assets
-- Search assets
-- Filter by:
-  - Asset Category
-  - Operational Status
-- Classify assets according to:
-
-  - Confidentiality
-  - Integrity
-  - Availability (CIA)
-
-Each asset stores:
-
-- Asset Name
-- Description
-- Owner
-- Location
-- Classification
-- Operational Status
-- Criticality
-- CIA Ratings
+- .github/ — GitHub workflow and configuration
+- ai/ — AI or experiment notes and resources
+- templates/ — HTML templates and static prototype pages
+  - templates/risk_whisperers/README.md documents the static HTML prototypes included
+- risk_whisperers/ — Django app (views, models, templates)
+- users/ — Django app for user management
+- webapp/ — additional web application assets (if present)
+- static/ — shared static files (css, js, images)
+- scripts/ — helper scripts used during development
+- manage.py — Django management entrypoint
+- requirements.txt — Python dependencies
+- Dockerfile / .dockerignore — container configuration
+- database_schema.sql, risksys_db2.sql, backup.json — database schema and dumps
 
 ---
 
-## Risk Management
+# Quickstart (development)
 
-The Risk Register enables users to:
-
-- Add risks
-- View risks
-- Edit risks
-- Search risks
-- Filter by:
-  - Asset
-  - Status
-  - Description
-
-Each risk records:
-
-- Associated Asset
-- Risk Description
-- Risk Category
-- Likelihood (1–5)
-- Impact (1–5)
-- Automatically Calculated Risk Rating
-- Risk Treatment
-- Risk Owner
-- Review Date
-- ISO 27001 Annex A Controls
-
----
-
-## Mitigation Management
-
-Users can create and manage mitigation plans for risks.
-
-Each mitigation contains:
-
-- Action Description
-- Assigned User
-- Target Date
-- Progress Status
-- Comments
-- Effectiveness Review Date
-
-Progress statuses include:
-
-- Not Started
-- In Progress
-- Completed
-
----
-
-## Reports
-
-The reporting module supports:
-
-- Date filtering
-- Asset category filtering
-- Risk status filtering
-
-Generated reports display:
-
-- Asset Category
-- Asset Name
-- Risk ID
-- Risk Rating
-- Risk Status
-- Mitigation Target Date
-
-Reports can be exported as:
-
-- CSV (Excel compatible)
-- PDF
-
-The PDF report includes:
-
-- Report metadata
-- Applied filters
-- Dashboard summary
-- Risk breakdown table
-
----
-
-## Audit Logs
-
-Every important system action is recorded in an immutable audit trail.
-
-Logged actions include:
-
-- Login
-- Asset Creation
-- Asset Update
-- Risk Creation
-- Risk Update
-- Mitigation Creation
-- Mitigation Update
-
-Audit logs can be filtered by:
-
-- User
-- Action Type
-- Date Range
-
----
-
-## Role-Based Access Control (RBAC)
-
-The application supports four user roles.
-
-### Administrator
-
-Can:
-
-- Manage users
-- Create assets
-- Edit assets
-- Create risks
-- Edit risks
-- Create mitigations
-- Edit mitigations
-- View reports
-- Export reports
-- View audit logs
-
----
-
-### Risk Manager
-
-Can:
-
-- Manage assets
-- Manage risks
-- Manage mitigations
-- Generate reports
-
----
-
-### Asset Owner
-
-Can:
-
-- View assigned assets
-- View associated risks
-- Manage assigned mitigations
-
----
-
-### Auditor / Viewer
-
-Can:
-
-- View assets
-- View risks
-- View reports
-- View audit logs
-
-No modification permissions are granted.
-
----
-
-# ISO/IEC 27001 Compliance
-
-The system incorporates several ISO/IEC 27001 security management practices, including:
-
-- Asset Classification
-- CIA Classification
-- Risk Assessment
-- Risk Treatment
-- Annex A Control Mapping
-- Audit Logging
-- Access Control
-- Accountability
-- Security Monitoring
-
----
-
-# Project Structure
-
-```
-RiskSys/
-│
-├── risk_whisperers/
-│   ├── templates/
-│   │   └── risk_whisperers/
-│   │       ├── dashboard.html
-│   │       ├── assets.html
-│   │       ├── add_asset.html
-│   │       ├── edit_asset.html
-│   │       ├── view_asset.html
-│   │       ├── risks.html
-│   │       ├── add_risk.html
-│   │       ├── edit_risk.html
-│   │       ├── view_risk.html
-│   │       ├── mitigations.html
-│   │       ├── add_mitigation.html
-│   │       ├── edit_mitigation.html
-│   │       ├── reports.html
-│   │       ├── report_print.html
-│   │       ├── audit_logs.html
-│   │       ├── user_management.html
-│   │       ├── login.html
-│   │       └── index.html
-│
-├── users/
-│   ├── models.py
-│   ├── views.py
-│   ├── admin.py
-│   └── migrations/
-│
-├── static/
-│   ├── css/
-│   ├── js/
-│   └── images/
-│
-├── manage.py
-├── requirements.txt
-└── README.md
-```
-
----
-
-# Installation
-
-## Clone the repository
+Clone the repository:
 
 ```bash
-git clone https://github.com/<your-username>/RiskSys.git
+git clone https://github.com/Uric01/Risk-Whisperers.git
+cd Risk-Whisperers
 ```
 
-```bash
-cd RiskSys
-```
-
----
-
-## Create a virtual environment
+Create and activate a Python virtual environment (example):
 
 Windows
 
 ```bash
 python -m venv .venv
-```
-
-Activate
-
-```bash
 .venv\Scripts\activate
 ```
 
@@ -325,21 +68,13 @@ python3 -m venv .venv
 source .venv/bin/activate
 ```
 
----
-
-## Install dependencies
+Install Python dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
----
-
-## Configure the database
-
-Create a PostgreSQL database.
-
-Update **settings.py**
+Configure the database (PostgreSQL) and update settings in the Django settings module. Example settings snippet:
 
 ```python
 DATABASES = {
@@ -354,100 +89,73 @@ DATABASES = {
 }
 ```
 
----
-
-## Apply migrations
+Apply migrations:
 
 ```bash
 python manage.py migrate
 ```
 
----
-
-## Create an administrator account
+Create a superuser for the admin interface:
 
 ```bash
 python manage.py createsuperuser
 ```
 
----
-
-## Start the development server
+Run the development server:
 
 ```bash
 python manage.py runserver
 ```
 
-Visit:
+Open the app in your browser at:
 
-```
 http://127.0.0.1:8000/
-```
 
 ---
 
-# Technologies Used
+# Notes about the templates/ directory
+
+The repository contains a set of static HTML prototypes maintained in `templates/risk_whisperers/`. Those files are simple HTML mockups and include comments indicating backend work required for a Flask/Django port. There are also legacy/prototype files referencing a PHP implementation — these are included for reference only.
+
+---
+
+# Technologies used
 
 - Python 3
 - Django
 - PostgreSQL
 - Bootstrap 5
-- HTML5
-- CSS3
-- JavaScript
+- HTML5 / CSS3 / JavaScript
 - ReportLab
-- Git
-- GitHub
+- Docker
+- Git / GitHub
 
 ---
 
-# Security Features
-
-The application includes multiple security controls:
+# Security features (high-level)
 
 - Authentication
 - Role-Based Access Control
-- Django CSRF Protection
-- Secure ORM Queries
-- Input Validation
-- Audit Logging
-- Login Protection
-- Database Integrity Constraints
-- Foreign Key Enforcement
-- Server-side Validation
+- CSRF protections (Django)
+- Secure ORM queries and server-side validation
+- Audit logging and integrity constraints
 
 ---
 
-# Future Enhancements
-
-Planned improvements include:
+# Future improvements (examples)
 
 - Multi-factor Authentication (MFA)
-- Email Notifications
-- Risk Heat Maps
-- ISO 27001 Compliance Dashboard
-- REST API
-- Dashboard Analytics
-- Asset Import/Export
-- Automated Risk Scoring
-- Backup and Restore
-- Cloud Deployment
-- AI-assisted Risk Recommendations
-- Risk Trend Visualisations
+- Email notifications
+- Risk heat maps and analytics
+- REST API endpoints
+- Asset import/export and backup/restore
+- Cloud deployment and CI/CD automation
 
 ---
 
 # Testing
 
-The project includes:
-
-- Unit Testing
-- System Testing
-- Manual Functional Testing
-- CRUD Validation
-- Role-Based Access Control Testing
-- Report Generation Testing
-- Audit Log Verification
+This project includes unit and system testing plus manual functional testing steps. The repository also contains exported SQL data and schema files to help with integration testing.
 
 ---
 
@@ -463,4 +171,4 @@ Richfield Graduate Institute of Technology
 
 # Licence
 
-This project is developed for academic purposes as part of a final-year BSc Information Technology research project.
+This project was developed for academic purposes as part of a final-year BSc Information Technology research project.
