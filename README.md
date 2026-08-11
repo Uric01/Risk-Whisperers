@@ -1,4 +1,4 @@
-# Risk-Whisperers (RiskSys) — Web-Based Asset Risk Management System
+# Risk-Whisperers (RiskSys) - Web-Based Asset Risk Management System
 
 ## Project Overview
 
